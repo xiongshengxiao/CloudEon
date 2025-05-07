@@ -1,0 +1,49 @@
+rules:
+    - alert: DsMaster存活数检测
+      promql: sum(up{job="metrics-ds-master"})<#{{${serviceRoles['DS_MASTER']?size}}}#
+      alertLevel: exception
+      serviceRoleName: DS_MASTER
+      alertAdvice: DS_MASTER发生宕机，请检查日志或执行重启
+      alertInfo: "DS_MASTER发生宕机，当前存活实例数为：{{$value}}"
+    - alert: DsMaster进程存活
+      promql: up{job="metrics-ds-master"} != 1
+      alertLevel: exception
+      serviceRoleName: DS_MASTER
+      alertAdvice: DS_MASTER宕机，请重新启动
+      alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例产生告警"
+    - alert: DsWorker存活数检测
+      promql: sum(up{job="metrics-ds-worker"})<#{{${serviceRoles['DS_WORKER']?size}}}#
+      alertLevel: exception
+      serviceRoleName: DS_WORKER
+      alertAdvice: DS_WORKER发生宕机，请检查日志或执行重启
+      alertInfo: "DS_WORKER发生宕机，当前存活实例数为：{{$value}}"
+    - alert: DsWorker进程存活
+      promql: up{job="metrics-ds-worker"} != 1
+      alertLevel: exception
+      serviceRoleName: DS_WORKER
+      alertAdvice: DS_WORKER宕机，请重新启动
+      alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例产生告警"
+    - alert: DsApi存活数检测
+      promql: sum(up{job="metrics-ds-api"})<#{{${serviceRoles['DS_API']?size}}}#
+      alertLevel: exception
+      serviceRoleName: DS_API
+      alertAdvice: DS_API发生宕机，请检查日志或执行重启
+      alertInfo: "DS_API发生宕机，当前存活实例数为：{{$value}}"
+    - alert: DsApi进程存活
+      promql: up{job="metrics-ds-api"} != 1
+      alertLevel: exception
+      serviceRoleName: DS_API
+      alertAdvice: DS_API宕机，请重新启动
+      alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例产生告警"
+    - alert: DsAlert存活数检测
+      promql: sum(up{job="metrics-ds-alert"})<#{{${serviceRoles['DS_ALERT']?size}}}#
+      alertLevel: exception
+      serviceRoleName: DS_ALERT
+      alertAdvice: DS_ALERT发生宕机，请检查日志或执行重启
+      alertInfo: "DS_ALERT发生宕机，当前存活实例数为：{{$value}}"
+    - alert: DsAlert进程存活
+      promql: up{job="metrics-ds-alert"} != 1
+      alertLevel: exception
+      serviceRoleName: DS_ALERT
+      alertAdvice: DS_ALERT宕机，请重新启动
+      alertInfo: "{{ $labels.job }}的{{ $labels.instance }}实例产生告警"

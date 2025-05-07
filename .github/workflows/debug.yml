@@ -1,0 +1,22 @@
+name: Experiment
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  my-job:
+    runs-on: ubuntu-latest
+
+
+    steps:
+        - name: Get tag
+          id: tag
+          uses: devops-actions/action-get-tag@v1.0.1
+          with:
+            strip_v: false # Optional: Remove 'v' character from version
+            default: v0.0.0 # Optional: Default version when tag not found
+
+        - name: Use tag
+          run: echo ${{steps.tag.outputs.tag}}

@@ -1,0 +1,12 @@
+- type: log
+  enabled: true
+  fields:
+    service: DINKY
+    role: DINKY_SERVER
+  paths:
+    - /workspace/logs/*dinky*.log
+  multiline.pattern: '^\[dinky\]  '
+  multiline.negate: true
+  multiline.match: after
+  close_timeout: 5m
+

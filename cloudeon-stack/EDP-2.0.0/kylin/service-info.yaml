@@ -1,0 +1,121 @@
+name: KYLIN
+label: "Kylin"
+description: "大数据开源OLAP 引擎，支持在数万亿条记录上实现亚秒级查询延迟"
+version: 5.0.0-beta
+dockerImage: "registry.cn-hangzhou.aliyuncs.com/udh/kylin:5.0.0-alpha"
+dependencies:
+    - "HIVE"
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles:
+  - name: KYLIN_SERVER
+    label: "Kylin Server"
+    roleFullName: "kylin-server"
+    sortNum: 1
+    type: DEPLOYMENT
+    fixedNum: 1
+    linkExpression: "http://${localhostname}:${conf['kylin.ui.port']}/kylin/index.html"
+
+customConfigFiles:
+  - "kylin.properties"
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/kylin:5.0.0-beta"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: "kylin.ui.port"
+    recommendExpression: "27070"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "kylin = server web ui端口"
+    tag: "端口"
+  - name: "kylin.hdfs.work.dir"
+    recommendExpression: "/kylin"
+    valueType: InputString
+    configurableInWizard: true
+    description: "kylin hdfs 工作目录"
+    tag: "常用参数"
+
+  - name: "ConnectionDriverName"
+    recommendExpression: "com.mysql.jdbc.Driver"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖数据库的jdbc驱动类"
+    tag: "常用参数"
+
+  - name: "ConnectionUserName"
+    recommendExpression: "root"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖数据库的登录账户"
+    needChangeInWizard: false
+    tag: "常用参数"
+
+  - name: "ConnectionPassword"
+    recommendExpression: "xxx"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖数据库的登录密码"
+    needChangeInWizard: true
+    tag: "常用参数"
+
+  - name: "ConnectionURL"
+    recommendExpression: "jdbc:mysql://xxx:3306/kylin?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8"
+    valueType: InputString
+    configurableInWizard: true
+    description: "依赖数据库的jdbc访问地址"
+    needChangeInWizard: true
+    tag: "常用参数"
+
+
+  - name: kylin.jvm.memory.percentage
+    description: "Kylin jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 75
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kylin.container.limit.cpu
+    description: "Kylin容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kylin.container.limit.memory
+    description: "Kylin容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kylin.container.request.cpu
+    description: "Kylin容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kylin.container.request.memory
+    description: "Kylin容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+

@@ -1,0 +1,12 @@
+- type: log
+  enabled: true
+  fields:
+    service: DATAVINES
+    role: DATAVINES_SERVER
+  paths:
+    - /workspace/logs/*datavines*.log
+  multiline.pattern: '^\[datavines\]  '
+  multiline.negate: true
+  multiline.match: after
+  close_timeout: 5m
+

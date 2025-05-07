@@ -1,0 +1,169 @@
+name: TRINO
+label: "Trino"
+description: "Trino是一个分布式SQL查询引擎，用于在大型数据集上执行交互式分析。"
+version: "424"
+dependencies:
+  - "HIVE"
+
+supportKerberos: false
+
+dashboard:
+  uid: "trino001"
+
+roles:
+  - name: TRINO_COORDINATOR
+    label: "Trino Coordinator"
+    roleFullName: "trino-coordinator"
+    linkExpression: "http://${localhostname}:${conf['coordinator.http.port']}"
+    sortNum: 1
+    type: DEPLOYMENT
+    fixedNum: 1
+
+  - name: TRINO_WORKER
+    label: "Trino Worker"
+    roleFullName: "trino-worker"
+    linkExpression: "http://${localhostname}:${conf['worker.http.port']}"
+    sortNum: 2
+    type: DEPLOYMENT
+    minNum: 1
+
+customConfigFiles:
+  - coordinator-config.properties
+  - worker-config.properties
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/trino:424"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: environmentName
+    recommendExpression: "production"
+    valueType: InputString
+    configurableInWizard: true
+    description: "集群环境名称"
+    tag: "常用参数"
+
+  - name: coordinator.http.port
+    recommendExpression: 8085
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Trino Coordinator http访问端口"
+    tag: "端口"
+
+  - name: worker.http.port
+    recommendExpression: 8086
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Trino Worker http访问端口"
+    tag: "端口"
+
+  - name: query.maxMemory
+    recommendExpression: 4
+    valueType: InputNumber
+    unit: GB
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: worker.query.maxMemoryPerNode
+    recommendExpression: 1
+    valueType: InputNumber
+    unit: "GB"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: coordinator.query.maxMemoryPerNode
+    recommendExpression: 1
+    valueType: InputNumber
+    unit: "GB"
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: trino.coordinator.jvm.memory.percentage
+    description: "Trino Coordinator jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 75
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: trino.coordinator.container.limit.cpu
+    description: "Trino Coordinator容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: trino.coordinator.container.limit.memory
+    description: "Trino Coordinator容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: trino.coordinator.container.request.cpu
+    description: "Trino Coordinator容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: trino.coordinator.container.request.memory
+    description: "Trino Coordinator容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+
+  - name: trino.worker.jvm.memory.percentage
+    description: "Trino Worker jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 75
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: trino.worker.container.limit.cpu
+    description: "Trino Worker容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: trino.worker.container.limit.memory
+    description: "Trino Worker容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: trino.worker.container.request.cpu
+    description: "Trino Worker容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: trino.worker.container.request.memory
+    description: "Trino Worker容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+
+
+
+
+
+

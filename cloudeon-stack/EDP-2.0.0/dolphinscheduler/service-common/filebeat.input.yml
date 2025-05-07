@@ -1,0 +1,53 @@
+- type: log
+  enabled: true
+  fields:
+    service: DOLPHINSCHEDULER
+    role: DS_API
+  paths:
+    - /workspace/logs/*api*.log
+  multiline:
+    pattern: '^\[[A-Z]+\] \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} [+-]\d{4}'
+    negate: true
+    match: after
+  close_timeout: 5m
+
+- type: log
+  enabled: true
+  fields:
+    service: DOLPHINSCHEDULER
+    role: DS_MASTER
+  paths:
+    - /workspace/logs/*master*.log
+  multiline:
+    pattern: '^\[[A-Z]+\] \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} [+-]\d{4}'
+    negate: true
+    match: after
+  close_timeout: 5m
+
+- type: log
+  enabled: true
+  fields:
+    service: DOLPHINSCHEDULER
+    role: DS_WORKER
+  paths:
+    - /workspace/logs/*worker*.log
+  multiline:
+    pattern: '^\[[A-Z]+\] \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} [+-]\d{4}'
+    negate: true
+    match: after
+  close_timeout: 5m
+
+- type: log
+  enabled: true
+  fields:
+    service: DOLPHINSCHEDULER
+    role: DS_ALERT
+  paths:
+    - /workspace/logs/*alert*.log
+  multiline:
+    pattern: '^\[[A-Z]+\] \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} [+-]\d{4}'
+    negate: true
+    match: after
+  close_timeout: 5m
+
+

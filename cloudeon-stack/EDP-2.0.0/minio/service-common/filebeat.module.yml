@@ -1,0 +1,13 @@
+- module: minio
+  audit:
+    enabled: false
+    var.paths:
+      - "/workspace/logs/minio_audit.log*"
+  log:
+    enabled: true
+    input:
+      fields:
+        service: MINIO
+        role: MINIO_SERVER
+    var.paths:
+      - "/workspace/logs/minio*.log*"

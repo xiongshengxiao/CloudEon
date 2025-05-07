@@ -1,0 +1,127 @@
+name: MINIO
+label: "MinIO"
+description: "支持主流的云原生容器化部署、兼容S3的高性能分布式对象存储系统"
+version: 2021-04-22T15-44-28Z
+
+dependencies:
+  - "GLOBAL"
+
+supportKerberos: false
+
+dashboard:
+  # MinIO 的 dashboard ui ID，要与 kube-prometheus-render/grafana-dashboard.yaml.ftl 中的一致！
+  uid: minio001
+
+roles:
+  - name: MINIO_SERVER
+    label: "MinIO Server"
+    roleFullName: "minio-server"
+    linkExpression: "http://${localhostname}:${conf['minio.server.port']}"
+    sortNum: 1
+    type: DEPLOYMENT
+
+    needOdd: false
+    minNum: 4
+
+customConfigFiles:
+  - minio-env.sh
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/minio:2021-04-22T15-44-28Z"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: minio.container.limit.cpu
+    description: "MinIO Server容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: minio.container.limit.memory
+    description: "MinIO Server容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: minio.container.request.cpu
+    description: "MinIO Server容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: minio.container.request.memory
+    description: "MinIO Server容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: minio.server.port
+    recommendExpression: 9000
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "绑定的访问端口，API和UI访问的共用端口"
+    label: ""
+    tag: "端口"
+
+  - name: minio.metrics.port
+    recommendExpression: 9000
+    valueType: InputNumber
+    configurableInWizard: true
+    # 旧版metrics_path为/minio/prometheus/metrics，新版server/nodes/buckets/resources分别为/minio/v2/metrics/[cluster|node|bucket|resource]，
+    # 具体参考 https://docs.minio.io/docs/how-to-monitor-minio-using-prometheus.html
+    description: "MinIO metrics 端口"
+    tag: "端口"
+
+#  - name: minio.root.user
+  - name: MINIO_ROOT_USER
+    recommendExpression: "minio"
+    valueType: InputString
+    confFile: "minio-env.sh"
+    configurableInWizard: true
+    label: "用户名"
+    description: "用户名，长度最小是5个字符"
+    tag: "常用参数"
+
+#  - name: minio.root.password
+  - name: MINIO_ROOT_PASSWORD
+    recommendExpression: "minio@321"
+    valueType: InputString
+    confFile: "minio-env.sh"
+    configurableInWizard: true
+    label: "密码"
+    description: "密码不能设置过于简单，否则MinIO会启动失败，长度最小是8个字符"
+    tag: "常用参数"
+
+  - name: bindHost
+    recommendExpression: "0.0.0.0"
+    valueType: InputString
+    confFile: "minio-env.sh"
+    configurableInWizard: true
+    label: "绑定可访问的主机"
+    description: "绑定可访问的主机，必须是 IP 或 主机名，通常使用 0.0.0.0 来绑定以便任意主机/IP都能访问"
+    tag: "常用参数"
+
+  - name: MINIO_VOLUMES
+    recommendExpression: "http://{host}/data/minio-data"
+    valueType: InputString
+    confFile: "minio-env.sh"
+    configurableInWizard: true
+    label: "集群节点数据存储卷或路径"
+    description: "集群节点数据存储卷或路径，必须根据指定格式将各部署节点配置上，按空格分隔；或者使用更简便的单行写法，示例：http://data-dev0{1...4}/data/minio-data{1...2}"
+    tag: "常用参数"

@@ -1,0 +1,268 @@
+name: DORIS
+label: "Doris"
+description: "基于 MPP 架构的高性能、实时分析型数据库"
+version: 2.1.8.1
+dependencies: []
+
+supportKerberos: false
+
+dashboard:
+  uid: "doris001"
+
+roles:
+  - name: DORIS_FE_MASTER
+    label: "Doris Fe Master"
+    roleFullName: "doris-fe-master"
+    linkExpression: "http://${localhostname}:${conf['http_port']}/"
+    sortNum: 1
+    type: DEPLOYMENT
+    needOdd: true
+    minNum : 1
+
+  - name: DORIS_FE_FOLLOWER
+    label: "Doris Fe Follower"
+    roleFullName: "doris-fe-follower"
+    linkExpression: "http://${localhostname}:${conf['http_port']}/"
+    sortNum: 1
+    type: DEPLOYMENT
+    needOdd: true
+    minNum : 1
+
+  - name: DORIS_FE_OBSERVER
+    label: "Doris Fe Observer"
+    roleFullName: "doris-fe-observer"
+    linkExpression: "http://${localhostname}:${conf['http_port']}/"
+    sortNum: 1
+    type: DEPLOYMENT
+    needOdd: true
+    minNum : 1
+
+  - name: DORIS_BE
+    label: "Doris Be"
+    roleFullName: "doris-be"
+    linkExpression: "http://${localhostname}:${conf['webserver_port']}/"
+    sortNum: 2
+    type: DEPLOYMENT
+    minNum: 1
+
+customConfigFiles:
+  - fe.conf
+  - be.conf
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/doris:2.1.8.1"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: sys_log_level
+    recommendExpression: INFO
+    valueType: Select
+    options: ["INFO","DEBUG","WARN","ERROR"]
+    confFile: "be.conf"
+    configurableInWizard: true
+    description: "BE服务日志级别"
+    tag: "常用参数"
+
+  - name: fragment_pool_queue_size
+    recommendExpression: 2048
+    valueType: InputNumber
+    confFile:  "be.conf"
+    description: "单节点上能够处理的查询请求上限"
+    tag: "性能"
+
+  - name: fragment_pool_thread_num_max
+    recommendExpression: 512
+    valueType: InputNumber
+    confFile:  "be.conf"
+    label: "后续查询请求动态创建线程"
+    description: "后续查询请求动态创建线程，最大创建512个线程。"
+    tag: "性能"
+
+  - name: be_port
+    recommendExpression: 9060
+    valueType: InputNumber
+    confFile: "be.conf"
+    configurableInWizard: true
+    label: "BE admin端口"
+    description: "BE admin端口"
+    tag: "端口"
+
+  - name: webserver_port
+    recommendExpression: 18040
+    configurableInWizard: true
+    valueType: InputNumber
+    confFile:  "be.conf"
+    description: "Be web页面访问端口"
+    tag: "端口"
+
+  - name: brpc_port
+    recommendExpression: 8060
+    valueType: InputNumber
+    confFile:  "be.conf"
+    configurableInWizard: true
+    description: "BE Rpc端口"
+    tag: "端口"
+
+  - name: heartbeat_service_port
+    recommendExpression: 9050
+    valueType: InputNumber
+    confFile:  "be.conf"
+    configurableInWizard: true
+    description: "BE心跳服务端口"
+    tag: "端口"
+
+  - name: string_type_length_soft_limit_bytes
+    recommendExpression: 33554432
+    valueType: InputNumber
+    confFile: "be.conf"
+    configurableInWizard: true
+    description: "String变长字符串类型长度限制，默认支持 1048576B（1MB），可调大到 2147483643B（2GB），这里预设 33554432B（32MB）"
+    tag: "常用参数"
+
+  - name: rpc_port
+    recommendExpression: 9020
+    valueType: InputNumber
+    confFile:  "fe.conf"
+    configurableInWizard: true
+    label: "FE节点上Thrift服务器的端口"
+    description: "FE 节点上 Thrift 服务器的端口。"
+    tag: "端口"
+
+  - name: query_port
+    recommendExpression: 9030
+    valueType: InputNumber
+    confFile:  "fe.conf"
+    configurableInWizard: true
+    label: "FE节点上MySQL服务器的端口"
+    description: "FE 节点上 MySQL 服务器的端口"
+    tag: "端口"
+
+  - name: http_port
+    recommendExpression: 18030
+    valueType: InputNumber
+    confFile: "fe.conf"
+    configurableInWizard: true
+    label: "FE节点上web页面的端口"
+    description: "FE节点上web页面的端口"
+    tag: "端口"
+
+  - name: edit_log_port
+    recommendExpression: 9010
+    valueType: InputNumber
+    confFile:  "fe.conf"
+    configurableInWizard: true
+    label: "FE节点上bdbje 的通信端口"
+    description: "FE节点上bdbje 的通信端口"
+    tag: "端口"
+
+  - name: cluster_id
+    recommendExpression: 123
+    valueType: InputNumber
+    confFile:  "fe.conf"
+    configurableInWizard: true
+    label: "集群ID"
+    description: "如果节点（FE 或 BE）具有相同的集群 id，则将认为它们属于同一个Doris 集群"
+    tag: "常用参数"
+
+  - name: lower_case_table_names
+    recommendExpression: 0
+    valueType: Select
+    options: [0,1,2]
+    confFile:  "fe.conf"
+    configurableInWizard: true
+    label: "表名大小写是否敏感,只有初始化安装时有效"
+    description: "表名大小写是否敏感,只有初始化安装时有效。值为 0 时，表名大小写敏感。默认为0。\n值为 1 时，表名大小写不敏感，doris在存储和查询时会将表名转换为小写。\n优点是在一条语句中可以使用表名的任意大小写形式\n缺点是建表后无法获得建表语句中指定的表名，show tables 查看的表名为指定表名的小写。\n值为 2 时，表名大小写不敏感，doris存储建表语句中指定的表名，查询时转换为小写进行比较。\n优点是show tables 查看的表名为建表语句中指定的表名；\n缺点是同一语句中只能使用表名的一种大小写形式。"
+    tag: "常用参数"
+
+  - name: enable_outfile_to_local
+    recommendExpression: true
+    valueType: Switch
+    confFile:  "fe.conf"
+    configurableInWizard: true
+    label: "允许将结果数据导出为文件到本地磁盘"
+    description: "允许将结果数据导出为文件到本地磁盘"
+    tag: "常用参数"
+
+
+  - name: doris.fe.jvm.memory.percentage
+    description: "Doris Fe jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 75
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: doris.fe.container.limit.cpu
+    description: "Doris Fe容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: doris.fe.container.limit.memory
+    description: "Doris Fe容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: doris.fe.container.request.cpu
+    description: "Doris Fe容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: doris.fe.container.request.memory
+    description: "Doris Fe容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: doris.be.jvm.memory.percentage
+    description: "Doris Be jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 75
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: doris.be.container.limit.cpu
+    description: "Doris Be容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: doris.be.container.limit.memory
+    description: "Doris Be容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: doris.be.container.request.cpu
+    description: "Doris Be容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: doris.be.container.request.memory
+    description: "Doris Be容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+

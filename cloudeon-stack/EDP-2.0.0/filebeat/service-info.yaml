@@ -1,0 +1,26 @@
+name: FILEBEAT
+label: "Filebeat"
+description: "日志采集工具"
+version: 7.16.3
+
+dependencies: []
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles: []
+
+customConfigFiles: []
+
+configurations:
+
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/filebeat:7.16.3"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+

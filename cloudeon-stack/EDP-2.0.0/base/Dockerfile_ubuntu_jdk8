@@ -1,0 +1,31 @@
+FROM ubuntu:22.04
+SHELL ["/bin/bash", "-c"]
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
+
+ENV TZ=Asia/Shanghai  \
+    FREEMARKER_GENERATOR_CLI_HOME=/opt/freemarker-generator-cli
+ENV PATH=$PATH:$FREEMARKER_GENERATOR_CLI_HOME/bin
+
+RUN apt-get update && apt-get install -y curl
+RUN curl -L https://gitee.com/RubyMetric/chsrc/releases/download/pre/chsrc-x64-linux -o chsrc && chmod +x ./chsrc && mv ./chsrc /usr/bin/
+RUN chsrc set ubuntu first
+
+RUN apt-get update && apt-get install -y wget net-tools vim perl debianutils  netcat zip unzip lsof bc hostname cron
+
+ADD freemarker-generator-cli-0.2.0-SNAPSHOT-app.tar.gz /opt/
+RUN mv /opt/freemarker-generator-cli-* /opt/freemarker-generator-cli
+
+# setup jmx exporter
+RUN wget https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.20.0/jmx_prometheus_javaagent-0.20.0.jar  \
+    && mkdir -p /opt/jmx_exporter  \
+    && mv jmx_prometheus_javaagent-0.20.0.jar /opt/jmx_exporter/jmx_prometheus_javaagent.jar
+
+RUN apt update && \
+    apt install -y openjdk-8-jdk
+
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+ENV LD_LIBRARY_PATH=$JAVA_HOME/lib/amd64/jli:$JAVA_HOME/lib/amd64
+
+RUN chsrc set ubuntu first && apt-get install -y mysql-client

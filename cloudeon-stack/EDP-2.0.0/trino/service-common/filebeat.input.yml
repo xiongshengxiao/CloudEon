@@ -1,0 +1,24 @@
+- type: log
+  enabled: true
+  fields:
+    service: TRINO
+    role: TRINO_COORDINATOR
+  paths:
+    - /workspace/logs/*coordinator*.log
+  multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  multiline.negate: true
+  multiline.match: after
+  close_timeout: 5m
+
+
+- type: log
+  enabled: true
+  fields:
+    service: TRINO
+    role: TRINO_WORKER
+  paths:
+    - /workspace/logs/*worker*.log
+  multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+  multiline.negate: true
+  multiline.match: after
+  close_timeout: 5m

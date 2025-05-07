@@ -1,0 +1,86 @@
+server:
+  port: ${SERVER_PORT:7700}
+  shutdown: graceful
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+  health:
+    elasticsearch:
+      enabled: false
+spring:
+  profiles:
+    active: ${DB_ACTIVE:mysql},${PROFILE_ACTIVE:dev} #[h2,mysql][dev,prod]
+  main:
+    banner-mode: log
+    allow-circular-references: true
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: true
+    clean-disabled: true
+    validate-on-migrate: true
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 0
+      max-file-size: 209715200
+      max-request-size: 209715200
+cloudeon:
+  home.path: ${CLOUDEON_HOME:D:/Dev/myProject/CloudEonDev}
+  stack.load.path: ${cloudeon.home.path}/cloudeon-stack
+  task.log: ${java.io.tmpdir}/log
+  work.home: ${java.io.tmpdir}/work
+  stackService.withKubeConfig: HELM_CONTROLLER
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB_NAME:cloudeon}?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:1qaz@WSX}
+---
+spring:
+  config:
+    activate:
+      on-profile: h2
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:file:${cloudeon.home.path}/db/cloudeon;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    username: root
+    password: eWJmP7yvpccHCtmVb61Gxl2XLzIrRgmT
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+logging:
+  config: classpath:logback-dev.xml
+  freemarker:
+    template-loader-path: classpath:/templates/
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+logging:
+  config: ${cloudeon.home.path}/conf/logback-prod.xml
+  freemarker:
+    template-loader-path: ${cloudeon.home.path}/conf/templates/
+cloudeon:
+  stack.load.path: ${cloudeon.home.path}/stack

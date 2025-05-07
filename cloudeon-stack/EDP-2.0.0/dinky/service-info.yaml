@@ -1,0 +1,136 @@
+name: DINKY
+label: "DINKY"
+description: "实时计算平台"
+version: 1.1.0
+dependencies:
+  - "FLINK"
+  - "YARN"
+  - "ZOOKEEPER"
+
+supportKerberos: false
+
+dashboard:
+  uid: "dinky001"
+
+roles:
+  - name: DINKY_SERVER
+    label: "DINKY"
+    roleFullName: "dinky-server"
+    linkExpression: "http://${localhostname}:${conf['dinky.server.port']}"
+    sortNum: 1
+    type: DEPLOYMENT
+
+    fixedNum : 1
+
+customConfigFiles: []
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/dinky:1.1.0"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+
+  - name: jvm.heap.memory.percentage
+    description: "dinky容器jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 50
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: jvm.perm_size.memory.percentage
+    description: "dinky容器jvm perm_size内存占容器内存限额的百分比"
+    recommendExpression: 30
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: resources.requests.cpu
+    recommendExpression: 0.1
+    needChangeInWizard: false
+    valueType: InputNumber
+    description: "容器请求CPU"
+    tag: "资源管理"
+    configurableInWizard: true
+  - name: resources.limits.cpu
+    recommendExpression: 1.0
+    needChangeInWizard: false
+    valueType: InputNumber
+    description: "容器限制CPU"
+    tag: "资源管理"
+    configurableInWizard: true
+  - name: resources.requests.memory
+    recommendExpression: 256
+    needChangeInWizard: false
+    valueType: InputNumber
+    unit: Mi
+    description: "容器请求内存，单位MB"
+    tag: "资源管理"
+    configurableInWizard: true
+  - name: resources.limits.memory
+    recommendExpression: 2048
+    needChangeInWizard: false
+    valueType: InputNumber
+    unit: Mi
+    description: "容器限制内存，单位MB"
+    tag: "资源管理"
+    configurableInWizard: true
+  - name: dinky.server.port
+    recommendExpression: 12888
+    valueType: InputNumber
+    description: "Dinky端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: dinky.jmx.port
+    recommendExpression: 12889
+    valueType: InputNumber
+    description: "Dinky jmx端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: jdbc.mysql.host
+    recommendExpression: "127.0.0.1"
+    needChangeInWizard: true
+    valueType: InputString
+    description: "MySQL数据库主机名"
+    tag: "常用参数"
+    configurableInWizard: true
+  - name: jdbc.mysql.port
+    recommendExpression: 3306
+    needChangeInWizard: false
+    valueType: InputNumber
+    description: "MySQL数据库端口号"
+    tag: "常用参数"
+    configurableInWizard: true
+  - name: jdbc.mysql.database
+    recommendExpression: "dinky"
+    valueType: InputString
+    description: "MySQL数据库名"
+    tag: "常用参数"
+    needChangeInWizard: false
+    configurableInWizard: true
+  - name: jdbc.mysql.username
+    recommendExpression: "root"
+    valueType: InputString
+    description: "MySQL数据库用户名"
+    tag: "常用参数"
+    needChangeInWizard: false
+    configurableInWizard: true
+  - name: jdbc.mysql.password
+    recommendExpression: "xxx"
+    valueType: InputString
+    description: "MySQL数据库密码"
+    needChangeInWizard: true
+    tag: "常用参数"
+    configurableInWizard: true

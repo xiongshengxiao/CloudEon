@@ -1,0 +1,37 @@
+name: HELM_CONTROLLER
+label: "HELM CONTROLLER"
+description: "Helm控制器"
+version: 0.15.4
+
+dependencies:
+  - "GLOBAL"
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles:
+  - name: HELM_CONTROLLER
+    label: "HELM CONTROLLER"
+    roleFullName: "helm-controller"
+    sortNum: 1
+    type: DEPLOYMENT
+    minNum : 1
+    needOdd: false
+
+customConfigFiles: []
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/helm-controller:v0.16.5"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+  - name: helmDefaultJobImage
+    description: "helm默认任务镜像,是helm执行任务时使用的镜像"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/helm-controller:klipper-helm-v0.9.3-build20241008"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
