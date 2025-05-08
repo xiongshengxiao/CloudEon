@@ -1,3 +1,3 @@
-docker build  -f Dockerfile -t registry.cn-guangzhou.aliyuncs.com/bigdata200/flink:1.15.4  .
-docker push  registry.cn-guangzhou.aliyuncs.com/bigdata200/flink:1.15.4
+docker build  -f Dockerfile -t registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/flink:1.20.1 .
+docker push  registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/flink:1.20.1
 
