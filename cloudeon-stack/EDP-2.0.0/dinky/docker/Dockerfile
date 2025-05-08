@@ -1,31 +1,45 @@
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/flink:1.15.4
+# FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/flink:1.15.4
+# FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/flink:1.20.1
+FROM rockylinux:9
 
+LABEL baseos=rockylinux9
 
-ENV FLINK_VERSION=1.15.4
-ENV FLINK_BIG_VERSION=1.15
-ENV DINKY_VERSION="1.1.0"
-ENV DINKY_HOME="/opt/dinky"
-ENV PATH=$PATH:$DINKY_HOME/bin
+ENV FLINK_VERSION=1.20.1
+ENV FLINK_BIG_VERSION=1.20
+# ENV DINKY_VERSION=1.2.3
+# ENV DINKY_HOME=/opt/dinky
+# ENV PATH=$PATH:$DINKY_HOME/bin
 
-WORKDIR /tmp
-RUN wget https://github.com/DataLinkDC/dinky/releases/download/v${DINKY_VERSION}/dinky-release-${FLINK_BIG_VERSION}-${DINKY_VERSION}.tar.gz \
-    && tar zxvf dinky-release-*.tar.gz -C /opt && rm -f dinky-release-*.tar.gz \
-    && mv /opt/dinky-release-* $DINKY_HOME
+ENV TZ=Asia/Shanghai  \
+    FREEMARKER_GENERATOR_CLI_HOME=/opt/freemarker-generator-cli
+ENV DINKY_HOME=/opt/dinky \
+    DINKY_VERSION=1.2.3
+ENV JAVA_HOME=/opt/jdk-11.0.24
+ENV MYSQL_CLIENT_HOME=/opt/mysql-shell-8.4.4-linux-glibc2.28-x86-64bit
+ENV PATH=$PATH:$JAVA_HOME/bin:$FREEMARKER_GENERATOR_CLI_HOME/bin:$DINKY_HOME/bin:$MYSQL_CLIENT_HOME/bin \
+    LD_LIBRARY_PATH=$JAVA_HOME/lib/amd64/jli:$JAVA_HOME/lib/amd64
 
-ENV MYSQL_JDBC_DRIVER_VERSION=8.0.30
-RUN wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_JDBC_DRIVER_VERSION}/mysql-connector-java-${MYSQL_JDBC_DRIVER_VERSION}.jar \
-    && mv mysql-connector-java-${MYSQL_JDBC_DRIVER_VERSION}.jar $DINKY_HOME/lib/
+# TODO flink-1.20.1-conf.tgz 仅包含 flink/conf 目录及其配置文件（Dinky使用flink原生api提交任务，flink源码在提交任务过程中会读取dinky本地 /opt/flink/conf 下的文件作为容器内配置目录挂载，所以需要提前把 flink安装目录下的conf目录内文件全部复制到此，在集群配置处flink配置文件目录填写/opt/flink/conf即可。）
+ADD freemarker-generator-cli-0.2.0-SNAPSHOT-app.tar.gz jdk-11.0.24_linux-x64_bin.tar.gz \
+    mysql-community-client-8.4.4-el9.x86_64.tar.gz \
+    dinky-release-1.20-1.2.3-with-dependencies.tar.gz flink-1.20.1-conf.tgz /opt/
 
-
-RUN wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-connector-jdbc/1.15.4/flink-connector-jdbc-1.15.4.jar \
-    && wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-elasticsearch7/1.15.4/flink-sql-connector-elasticsearch7-1.15.4.jar \
-    && wget https://repo1.maven.org/maven2/org/apache/doris/flink-doris-connector-1.15/1.4.0/flink-doris-connector-1.15-1.4.0.jar \
-    && wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-kafka/1.15.4/flink-sql-connector-kafka-1.15.4.jar \
-    && wget https://repo1.maven.org/maven2/com/ververica/flink-sql-connector-mysql-cdc/2.4.1/flink-sql-connector-mysql-cdc-2.4.1.jar \
-    && wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-hive-3.1.2_2.12/1.15.4/flink-sql-connector-hive-3.1.2_2.12-1.15.4.jar \
-    && wget https://repo.maven.apache.org/maven2/org/apache/hudi/hudi-flink1.15-bundle/0.13.1/hudi-flink1.15-bundle-0.13.1.jar \
-    && mv *.jar $DINKY_HOME/extends/flink$FLINK_BIG_VERSION/
-RUN wget https://repository.cloudera.com/artifactory/cloudera-repos/org/apache/flink/flink-shaded-hadoop-3-uber/3.1.1.7.2.9.0-173-9.0/flink-shaded-hadoop-3-uber-3.1.1.7.2.9.0-173-9.0.jar \
-    && mv flink-shaded-hadoop-3-uber-3.1.1.7.2.9.0-173-9.0.jar $DINKY_HOME/extends/flink$FLINK_BIG_VERSION/dinky/
+RUN mv $DINKY_HOME-release-* $DINKY_HOME \
+    && mv /opt/flink-1.20.1 /opt/flink \
+    && mkdir /data \
+    && mv /opt/freemarker-generator-cli-* /opt/freemarker-generator-cli \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone \
+    # 安装 MySQL 官方客户端命令（相比 MySQL Shell，磁盘空间占用小） \
+    && dnf install -y /opt/mysql-community-client-plugins-8.4.4-1.el9.x86_64.rpm \
+    && dnf install -y /opt/mysql-community-common-8.4.4-1.el9.x86_64.rpm \
+    && dnf install -y /opt/mysql-community-libs-8.4.4-1.el9.x86_64.rpm \
+    && dnf install -y /opt/mysql-community-client-8.4.4-1.el9.x86_64.rpm \
+    # 安装 cron、nc、ps 等命令
+    && dnf install -y cronie \
+    && dnf install -y nmap \
+    && dnf install -y procps \
+    # 清理本地和下载的 rpm 安装包
+    && rm -fv /opt/mysql-community-*.rpm \
+    && dnf clean all
 
 WORKDIR $DINKY_HOME

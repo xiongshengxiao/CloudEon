@@ -176,10 +176,6 @@ spec:
         - name: local-data-${dataPath?index+1}
           mountPath: /data/${dataPath?index+1}
 </#list>
-        - name: hdfs-config
-          mountPath: /etc/hdfs-config
-        - name: yarn-config
-          mountPath: /etc/yarn-config
 <#if dependencies.FLINK??>
         - name: flink-config
           mountPath: /etc/flink-config
@@ -221,12 +217,6 @@ spec:
           name: filebeat-common-config
         name: filebeat-config
 </#if>
-      - name: hdfs-config
-        configMap:
-          name: hdfs-config
-      - name: yarn-config
-        configMap:
-          name: yarn-config
 <#if dependencies.FLINK??>
       - configMap:
           name: flink-config

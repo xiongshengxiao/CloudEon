@@ -1,11 +1,9 @@
 name: DINKY
-label: "DINKY"
-description: "实时计算平台"
-version: 1.1.0
+label: "Dinky"
+description: "开箱即用的一站式实时计算平台，简化 Flink 数据作业开发和运维"
+version: 1.2.3
 dependencies:
-  - "FLINK"
-  - "YARN"
-  - "ZOOKEEPER"
+  - "GLOBAL"
 
 supportKerberos: false
 
@@ -14,7 +12,7 @@ dashboard:
 
 roles:
   - name: DINKY_SERVER
-    label: "DINKY"
+    label: "Dinky"
     roleFullName: "dinky-server"
     linkExpression: "http://${localhostname}:${conf['dinky.server.port']}"
     sortNum: 1
@@ -27,7 +25,7 @@ customConfigFiles: []
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/dinky:1.1.0"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/dinky:1.2.3"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"
@@ -88,13 +86,13 @@ configurations:
     tag: "资源管理"
     configurableInWizard: true
   - name: dinky.server.port
-    recommendExpression: 12888
+    recommendExpression: 8888
     valueType: InputNumber
     description: "Dinky端口"
     tag: "端口"
     configurableInWizard: true
   - name: dinky.jmx.port
-    recommendExpression: 12889
+    recommendExpression: 10087
     valueType: InputNumber
     description: "Dinky jmx端口"
     tag: "端口"
