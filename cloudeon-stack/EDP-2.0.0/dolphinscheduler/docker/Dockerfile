@@ -1,15 +1,18 @@
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/hadoop:3.3.4
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/hadoop:3.3.4
 
 ENV FLINK_HOME=/opt/flink
-ENV FLINK_VERSION=1.15.4
+ENV FLINK_VERSION=1.20.1
 ENV PATH=$PATH:$FLINK_HOME/bin
 
 WORKDIR /tmp
 
-RUN wget https://mirrors.huaweicloud.com/apache/flink/flink-${FLINK_VERSION}/flink-${FLINK_VERSION}-bin-scala_2.12.tgz \
+# 下载并安装 Flink
+#RUN wget https://mirrors.huaweicloud.com/apache/flink/flink-${FLINK_VERSION}/flink-${FLINK_VERSION}-bin-scala_2.12.tgz \
+RUN wget https://mirrors.aliyun.com/apache/flink/flink-${FLINK_VERSION}/flink-${FLINK_VERSION}-bin-scala_2.12.tgz \
     && tar -zxvf flink-*.tgz -C /opt \
     && rm -f flink-*.tgz && mv /opt/flink-*  ${FLINK_HOME}
 
+# 下载并安装 Spark
 ENV SPARK_HOME=/opt/spark
 ENV SPARK_VERSION=3.2.3
 ENV PATH=$PATH:$SPARK_HOME/bin
@@ -18,8 +21,10 @@ RUN wget https://mirrors.huaweicloud.com/apache/spark/spark-${SPARK_VERSION}/spa
     && tar -zxvf spark-*.tgz -C /opt \
     && rm -f spark-*.tgz && mv /opt/spark-*  ${SPARK_HOME}
 
+# 支持 Iceberg
 # support iceberg
-RUN wget https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-3.2_2.12/1.2.1/iceberg-spark-runtime-3.2_2.12-1.2.1.jar \
+# RUN wget https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-3.2_2.12/1.2.1/iceberg-spark-runtime-3.2_2.12-1.2.1.jar \
+RUN wget https://maven.aliyun.com/repository/public/org/apache/iceberg/iceberg-spark-runtime-3.2_2.12/1.2.1/iceberg-spark-runtime-3.2_2.12-1.2.1.jar \
     && mv iceberg-spark-runtime*.jar ${SPARK_HOME}/jars/
 
 
@@ -29,39 +34,51 @@ ENV PATH=$PATH:$HIVE_HOME/bin
 
 WORKDIR /tmp
 
+# 下载并安装 Hive
 RUN wget https://mirrors.huaweicloud.com/apache/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz \
     && tar -zxvf apache-hive-*.tar.gz -C /opt \
     && rm -f apache-hive-*-bin.tar.gz && mv /opt/apache-hive-*  $HIVE_HOME
 
-
-ENV MYSQL_CONN_VERSION=8.0.20
+# 安装 MySQL Connector
+#ENV MYSQL_CONN_VERSION=8.0.20
+ENV MYSQL_CONN_VERSION=8.0.30
 ENV MYSQL_CONN_URL=https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-java-${MYSQL_CONN_VERSION}.tar.gz
 RUN  curl -fSL $MYSQL_CONN_URL -o /tmp/mysql-connector-java.tar.gz     && tar -xzvf /tmp/mysql-connector-java.tar.gz -C /tmp/   \
   && cp /tmp/mysql-connector-java-${MYSQL_CONN_VERSION}/mysql-connector-java-${MYSQL_CONN_VERSION}.jar $HIVE_HOME/lib/mysql-connector-java.jar  \
   && rm -rf /tmp/mysql-connector-*
 
 ENV DOLPHINSCHEDULER_HOME=/opt/dolphinscheduler
-ENV DOLPHINSCHEDULER_VERSION=3.2.2
+ENV DOLPHINSCHEDULER_VERSION=3.1.9
 ENV PATH=$PATH:$DOLPHINSCHEDULER_HOME/bin
 
-
+# 下载并安装 DolphinScheduler
 RUN wget https://mirrors.huaweicloud.com/apache/dolphinscheduler/${DOLPHINSCHEDULER_VERSION}/apache-dolphinscheduler-${DOLPHINSCHEDULER_VERSION}-bin.tar.gz \
     && tar -zxvf apache-dolphinscheduler-*.tar.gz -C /opt \
     && rm -f apache-dolphinscheduler-*.tar.gz && mv /opt/*dolphinscheduler*  $DOLPHINSCHEDULER_HOME
 
-RUN wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.28/mysql-connector-java-8.0.28.jar \
-    && cp mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/alert-server/libs/mysql-connector-java-8.0.28.jar \
-    && cp mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/api-server/libs/mysql-connector-java-8.0.28.jar \
-    && cp mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/master-server/libs/mysql-connector-java-8.0.28.jar \
-    && cp mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/tools/libs/mysql-connector-java-8.0.28.jar \
-    && cp mysql-connector-java-8.0.28.jar $DOLPHINSCHEDULER_HOME/worker-server/libs/mysql-connector-java-8.0.28.jar \
-    && rm -f mysql-connector-java-8.0.28.jar
+# 替换 start.sh 脚本中的 CLASSPATH 配置
+RUN for server in alert-server api-server master-server worker-server; do \
+        sed -i 's|-cp "\$DOLPHINSCHEDULER_HOME/conf":"\$DOLPHINSCHEDULER_HOME/libs/\*"|-cp "\$DOLPHINSCHEDULER_HOME/'"$server"'/conf":"\$DOLPHINSCHEDULER_HOME/'"$server"'/libs/\*"|g' $DOLPHINSCHEDULER_HOME/$server/bin/start.sh; \
+    done
+
+# 安装 MySQL Connector 到 DolphinScheduler 的各个服务中
+# RUN wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.30/mysql-connector-java-8.0.30.jar \
+RUN wget https://maven.aliyun.com/repository/public/mysql/mysql-connector-java/8.0.30/mysql-connector-java-8.0.30.jar \
+    && cp mysql-connector-java-8.0.30.jar $DOLPHINSCHEDULER_HOME/alert-server/libs/mysql-connector-java-8.0.30.jar \
+    && cp mysql-connector-java-8.0.30.jar $DOLPHINSCHEDULER_HOME/api-server/libs/mysql-connector-java-8.0.30.jar \
+    && cp mysql-connector-java-8.0.30.jar $DOLPHINSCHEDULER_HOME/master-server/libs/mysql-connector-java-8.0.30.jar \
+    && cp mysql-connector-java-8.0.30.jar $DOLPHINSCHEDULER_HOME/tools/libs/mysql-connector-java-8.0.30.jar \
+    && cp mysql-connector-java-8.0.30.jar $DOLPHINSCHEDULER_HOME/worker-server/libs/mysql-connector-java-8.0.30.jar \
+    && rm -f mysql-connector-java-8.0.30.jar
 
 RUN apt-get install -y mysql-client
+
 
 # 更新包列表并安装必要的工具
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
+    # 添加国内加速的 PPA 源
+    echo "deb https://launchpad.proxy.ustclug.org/deadsnakes/ppa/ubuntu jammy main" > /etc/apt/sources.list.d/deadsnakes-ppa.list && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && \
     apt-get install -y python3.11 python3.11-dev python3.11-venv python3-pip && \
@@ -86,9 +103,24 @@ RUN python --version && pip --version
 
 RUN chsrc set python first
 
-RUN \cp -f /opt/hive/lib/mysql-connector-java.jar $DOLPHINSCHEDULER_HOME/libs/
+#RUN \cp -f /opt/hive/lib/mysql-connector-java.jar $DOLPHINSCHEDULER_HOME/libs/
+RUN \cp -f /opt/hive/lib/mysql-connector-java.jar $DOLPHINSCHEDULER_HOME/alert-server/libs/ \
+    && \cp -f /opt/hive/lib/mysql-connector-java.jar $DOLPHINSCHEDULER_HOME/api-server/libs/ \
+    && \cp -f /opt/hive/lib/mysql-connector-java.jar $DOLPHINSCHEDULER_HOME/master-server/libs/ \
+    && \cp -f /opt/hive/lib/mysql-connector-java.jar $DOLPHINSCHEDULER_HOME/tools/libs/ \
+    && \cp -f /opt/hive/lib/mysql-connector-java.jar $DOLPHINSCHEDULER_HOME/worker-server/libs/
 
 RUN apt-get update && apt-get install -y sudo
 
-WORKDIR $DOLPHINSCHEDULER_HOME
+#RUN cp /opt/hadoop/etc/hadoop/core-site.xml $DOLPHINSCHEDULER_HOME/alert-server/conf/ && \
+#    cp /opt/hadoop/etc/hadoop/core-site.xml $DOLPHINSCHEDULER_HOME/alert-server/conf/ && \
+#    cp /opt/hadoop/etc/hadoop/hdfs-site.xml $DOLPHINSCHEDULER_HOME/api-server/conf/ && \
+#    cp /opt/hadoop/etc/hadoop/hdfs-site.xml $DOLPHINSCHEDULER_HOME/api-server/conf/ && \
+#    cp /opt/hadoop/etc/hadoop/core-site.xml $DOLPHINSCHEDULER_HOME/master-server/conf/ && \
+#    cp /opt/hadoop/etc/hadoop/core-site.xml $DOLPHINSCHEDULER_HOME/master-server/conf/ && \
+#    cp /opt/hadoop/etc/hadoop/hdfs-site.xml $DOLPHINSCHEDULER_HOME/tools/conf/ && \
+#    cp /opt/hadoop/etc/hadoop/hdfs-site.xml $DOLPHINSCHEDULER_HOME/tools/conf/ && \
+#    cp /opt/hadoop/etc/hadoop/hdfs-site.xml $DOLPHINSCHEDULER_HOME/worker-server/conf/ && \
+#    cp /opt/hadoop/etc/hadoop/hdfs-site.xml $DOLPHINSCHEDULER_HOME/worker-server/conf/
 
+WORKDIR $DOLPHINSCHEDULER_HOME
