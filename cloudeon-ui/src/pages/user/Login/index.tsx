@@ -27,14 +27,14 @@ import logoImg from '@/assets/images/logo2.png';
 const LoginMessage: React.FC<{
   content: string;
 }> = ({ content }) => (
-  <Alert
-    style={{
-      marginBottom: 24,
-    }}
-    message={content}
-    type="error"
-    showIcon
-  />
+    <Alert
+        style={{
+          marginBottom: 24,
+        }}
+        message={content}
+        type="error"
+        showIcon
+    />
 );
 
 const Login: React.FC = () => {
@@ -80,9 +80,18 @@ const Login: React.FC = () => {
         defaultMessage: '登录成功！',
       });
       message.success(defaultLoginSuccessMessage);
-      setToken(String(result?.data)||'')
-      setCurrentUser(JSON.stringify(params))
-      await fetchUserInfo(params);
+
+      // 保存token和完整的用户信息
+      const token = String(result?.data) || '';
+      setToken(token);
+      const userInfo = {
+        name: params.name,
+        token: token,
+        loginTime: new Date().getTime()
+      };
+      setCurrentUser(JSON.stringify(userInfo));
+      await fetchUserInfo(userInfo);
+
       /** 此方法会跳转到 redirect 参数所在的位置 */
       if (!history) return;
       const { query } = history.location;
@@ -130,53 +139,53 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className={styles.loginLayout}>
-      <div className={styles.loginContent}>
-        <div className={styles.loginLeft}>
-          {/* <div className={styles.title}>
+      <div className={styles.loginLayout}>
+        <div className={styles.loginContent}>
+          <div className={styles.loginLeft}>
+            {/* <div className={styles.title}>
             CloudEon
           </div>
           <div className={styles.subTitle}>
             基于k8s安装和运维大数据集群。
           </div> */}
-          <Image
-            width={400}
-            preview={false}
-            src={loginImg}
-          />
-        </div>
-        <div className={styles.loginRight}>
-          <div className={styles.loginText}>
-            <div className={styles.title}>
-              <Image style={{width:'150px',marginRight:'10px',marginBottom:'20px'}} src={logoImg}></Image>
-              {/* CloudEon */}
-            </div>
-            <div className={styles.subTitle}>
-              基于kubernetes安装和运维大数据集群
-            </div>
+            <Image
+                width={400}
+                preview={false}
+                src={loginImg}
+            />
           </div>
-          <div className={styles.loginForm}>
+          <div className={styles.loginRight}>
+            <div className={styles.loginText}>
+              <div className={styles.title}>
+                <Image style={{width:'150px',marginRight:'10px',marginBottom:'20px'}} src={logoImg}></Image>
+                {/* CloudEon */}
+              </div>
+              <div className={styles.subTitle}>
+                基于kubernetes安装和运维大数据集群
+              </div>
+            </div>
+            <div className={styles.loginForm}>
               <Form
-                name="basic"
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                initialValues={{ remember: true }}
-                onFinish={handleSubmit}
-                onFinishFailed={onFinishFailed}
-                autoComplete="off"
+                  name="basic"
+                  labelCol={{ span: 8 }}
+                  wrapperCol={{ span: 16 }}
+                  initialValues={{ remember: true }}
+                  onFinish={handleSubmit}
+                  onFinishFailed={onFinishFailed}
+                  autoComplete="off"
               >
                 <Form.Item
-                  label=""
-                  name="username"
-                  rules={[{ required: true, message: 'Please input your username!' }]}
+                    label=""
+                    name="username"
+                    rules={[{ required: true, message: 'Please input your username!' }]}
                 >
                   <Input prefix={<UserOutlined />} className={styles.inputItem} />
                 </Form.Item>
 
                 <Form.Item
-                  label=""
-                  name="password"
-                  rules={[{ required: true, message: 'Please input your password!' }]}
+                    label=""
+                    name="password"
+                    rules={[{ required: true, message: 'Please input your password!' }]}
                 >
                   <Input.Password prefix={<LockOutlined />} className={styles.inputItem} />
                 </Form.Item>
@@ -187,11 +196,11 @@ const Login: React.FC = () => {
                   </Button>
                 </Form.Item>
               </Form>
-          </div>
+            </div>
 
+          </div>
         </div>
       </div>
-    </div>
   );
 };
 

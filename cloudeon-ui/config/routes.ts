@@ -1,5 +1,4 @@
-﻿
-export default [
+﻿export default [
   // {
   //   path: '/colony',
   //   layout: true,
@@ -136,6 +135,32 @@ export default [
   {
     path: '/',
     redirect: '/colony/colonyMg',
+  },
+  {
+    path: '/account',
+    layout: false,
+    routes: [
+      {
+        path: '/account/center',
+        name: 'center',
+        component: './account/center',
+      },
+      {
+        path: '/account/settings',
+        name: 'settings',
+        component: './account/settings',
+      },
+      {
+        path: '/account/edit',
+        name: '修改密码',
+        component: './account/edit',
+      },
+      {
+        path: '/account/add',
+        name: '添加用户',
+        component: './account/add',
+      },
+    ],
   },
   {
     component: './404',

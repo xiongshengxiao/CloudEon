@@ -56,7 +56,7 @@ public class WebConfig implements WebMvcConfigurer {
      *
      * 意义：通过该前缀，避免Swagger,Actuator 意外通过Nginx暴露出来给外部，带来安全性问题
      *      这样Nginx只需配置转发到 指定统一前缀 的所有接口即可
-     * @see org.springframework.util.AntPathMatcher
+     * @see AntPathMatcher
      * @param configurer
      * @param api
      */
