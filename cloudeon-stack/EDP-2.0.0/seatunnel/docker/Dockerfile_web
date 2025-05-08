@@ -1,11 +1,14 @@
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel:2.3.7
+# FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel:2.3.7
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/seatunnel:2.3.8
 
-ENV SEATUNNEL_WEB_VERSION="1.0.1"
+# ENV SEATUNNEL_WEB_VERSION="1.0.1"
+ENV SEATUNNEL_WEB_VERSION="1.0.2"
 ENV SEATUNNEL_WEB_HOME="/opt/seatunnel-web"
 ENV PATH=$PATH:$SEATUNNEL_WEB_HOME/bin
 
 WORKDIR /opt
-RUN wget https://dlcdn.apache.org/seatunnel/seatunnel-web/${SEATUNNEL_WEB_VERSION}/apache-seatunnel-web-${SEATUNNEL_WEB_VERSION}-bin.tar.gz
+# RUN wget https://dlcdn.apache.org/seatunnel/seatunnel-web/${SEATUNNEL_WEB_VERSION}/apache-seatunnel-web-${SEATUNNEL_WEB_VERSION}-bin.tar.gz
+RUN wget https://mirrors.aliyun.com/apache/seatunnel/seatunnel-web/${SEATUNNEL_WEB_VERSION}/apache-seatunnel-web-${SEATUNNEL_WEB_VERSION}-bin.tar.gz
 RUN tar -xzvf apache-seatunnel-web-${SEATUNNEL_WEB_VERSION}-bin.tar.gz && rm -f *.gz
 RUN mv apache-seatunnel-web-* ${SEATUNNEL_WEB_HOME}
 RUN chsrc set ubuntu first && apt-get install -y mysql-client
@@ -16,7 +19,10 @@ RUN wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_JDBC_
     && mv mysql-connector-java-${MYSQL_JDBC_DRIVER_VERSION}.jar $SEATUNNEL_WEB_HOME/libs/
 
 RUN apt -y install maven &&  mvn -N io.takari:maven:wrapper
-RUN bash bin/download_datasource.sh 1.0.1
+
+RUN sed -i 's|${SEATUNNEL_WEB_HOME}/mvnw|mvn|g' bin/download_datasource.sh
+# RUN bash bin/download_datasource.sh 1.0.1
+RUN bash bin/download_datasource.sh ${SEATUNNEL_WEB_VERSION}
 
 
 

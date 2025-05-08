@@ -1,8 +1,7 @@
 name: SEATUNNEL
 label: "Seatunnel"
 description: "海量数据同步引擎"
-# version: 2.3.7
-version: 2.3.8
+version: 2.3.7
 dependencies:
   - "HDFS"
 
@@ -41,15 +40,13 @@ customConfigFiles: []
 configurations:
   - name: serverImage
     description: "服务镜像"
-    # recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel:2.3.7"
-    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/seatunnel:2.3.8"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel:2.3.7"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"
   - name: webImage
     description: "web服务镜像"
-    # recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel-web:1.0.1"
-    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/seatunnel-web:1.0.2"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/seatunnel-web:1.0.1"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"
