@@ -1,6 +1,5 @@
 <div align="center">
 <h1>Dromara CloudEon云原生大数据平台</h1>
-
 [![GitHub Pull Requests](https://img.shields.io/github/stars/dromara/CloudEon)](https://github.com/dromara/CloudEon/stargazers)
 [![Gitee Star](https://raw.githubusercontent.com/xiongshengxiao/MyPicGo/img/img/star.svg)](https://gitee.com/dromara/CloudEon/stargazers)
 
@@ -134,7 +133,7 @@ CloudEon 是基于 Kubernetes 的资源安装部署开源大数据组件，实�
 
 ### 本人微信-欢迎志同道合的朋友一起交流技术
 
-[<img src="https://raw.githubusercontent.com/xiongshengxiao/MyPicGo/img/img/3d84848615899c09a469891791f622e.jpg" alt="3d84848615899c09a469891791f622e" style="zoom: 25%;" />](https://cloudeon.dromara.org/images/wx.png)（添加请备注CloudEon）
+[<img src="https://raw.githubusercontent.com/xiongshengxiao/MyPicGo/img/img/3d84848615899c09a469891791f622e.jpg" alt="3d84848615899c09a469891791f622e" style="zoom: 25%;" />]()（添加请备注CloudEon）
 
 ## 🤝 贡献者
 
