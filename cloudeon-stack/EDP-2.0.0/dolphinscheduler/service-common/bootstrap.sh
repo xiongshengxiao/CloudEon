@@ -13,6 +13,12 @@ mkdir -p $DOLPHINSCHEDULER_HOME/conf
 \cp -f $HADOOP_CONF_DIR/*.xml $DOLPHINSCHEDULER_HOME/conf/
 \cp -f /opt/service-render-output/dolphinscheduler_env.sh $DOLPHINSCHEDULER_HOME/bin/env/
 
+\cp -f $HADOOP_CONF_DIR/*.xml $DOLPHINSCHEDULER_HOME/master-server/conf/
+\cp -f $HADOOP_CONF_DIR/*.xml $DOLPHINSCHEDULER_HOME/worker-server/conf/
+\cp -f $HADOOP_CONF_DIR/*.xml $DOLPHINSCHEDULER_HOME/api-server/conf/
+\cp -f $HADOOP_CONF_DIR/*.xml $DOLPHINSCHEDULER_HOME/alert-server/conf/
+\cp -f $HADOOP_CONF_DIR/*.xml $DOLPHINSCHEDULER_HOME/tools/conf/
+
 \cp -f /opt/service-render-output/common.properties $DOLPHINSCHEDULER_HOME/master-server/conf/
 # bootstrap.yaml中有k8s配置，干扰运行。其他只有spring.application.name配置项，已迁移到application.yaml
 rm -f $DOLPHINSCHEDULER_HOME/master-server/conf/bootstrap.yaml

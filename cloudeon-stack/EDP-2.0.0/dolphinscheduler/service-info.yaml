@@ -1,7 +1,8 @@
 name: DOLPHINSCHEDULER
 label: "DolphinScheduler"
 description: "可视化分布式任务调度与计算平台"
-version: 3.2.2
+#version: 3.2.2
+version: 3.1.9
 dependencies:
   - "ZOOKEEPER"
   - "HDFS"
@@ -48,7 +49,7 @@ customConfigFiles: []
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/dolphinscheduler:3.2.2"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/dolphinscheduler:3.1.9"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"

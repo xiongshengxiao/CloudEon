@@ -26,15 +26,8 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
   jetty:
     max-http-form-post-size: 5000000
-    accesslog:
-      enabled: true
-      custom-format: '%{client}a - %u %t "%r" %s %O %{ms}Tms'
 
 spring:
-  application:
-    name: api-server
-  profiles:
-    active: postgresql
   banner:
     charset: UTF-8
   jackson:
@@ -53,56 +46,45 @@ spring:
     password: root
     hikari:
       connection-test-query: select 1
+      minimum-idle: 5
+      auto-commit: true
+      validation-timeout: 3000
       pool-name: DolphinScheduler
+      maximum-pool-size: 50
+      connection-timeout: 30000
+      idle-timeout: 600000
+      leak-detection-threshold: 0
+      initialization-fail-timeout: 1
   quartz:
     auto-startup: false
     job-store-type: jdbc
     jdbc:
       initialize-schema: never
     properties:
+      org.quartz.threadPool.threadPriority: 5
       org.quartz.jobStore.isClustered: true
       org.quartz.jobStore.class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
       org.quartz.scheduler.instanceId: AUTO
       org.quartz.jobStore.tablePrefix: QRTZ_
       org.quartz.jobStore.acquireTriggersWithinLock: true
       org.quartz.scheduler.instanceName: DolphinScheduler
-      org.quartz.threadPool.class: org.apache.dolphinscheduler.scheduler.quartz.QuartzZeroSizeThreadPool
+      org.quartz.threadPool.class: org.quartz.simpl.SimpleThreadPool
       org.quartz.jobStore.useProperties: false
+      org.quartz.threadPool.makeThreadsDaemons: true
+      org.quartz.threadPool.threadCount: 25
       org.quartz.jobStore.misfireThreshold: 60000
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
-      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 1
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
-    static-path-pattern: /static/**
-  cloud.discovery.client.composite-indicator.enabled: false
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-  packages-to-scan: org.apache.dolphinscheduler.api
-
-# Mybatis-plus configuration, you don't need to change it
-mybatis-plus:
-  mapper-locations: classpath:org/apache/dolphinscheduler/dao/mapper/*Mapper.xml
-  type-aliases-package: org.apache.dolphinscheduler.dao.entity
-  configuration:
-    cache-enabled: false
-    call-setters-on-nulls: true
-    map-underscore-to-camel-case: true
-    jdbc-type-for-null: NULL
-  global-config:
-    db-config:
-      id-type: auto
-    banner: false
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,metrics,prometheus
+        include: '*'
   endpoint:
     health:
       enabled: true
@@ -125,54 +107,43 @@ registry:
       base-sleep-time: 60ms
       max-sleep: 300ms
       max-retries: 5
-    session-timeout: 60s
-    connection-timeout: 15s
-    block-until-connected: 15s
+    session-timeout: 30s
+    connection-timeout: 9s
+    block-until-connected: 600ms
     digest: ~
 
-api:
-  audit-enable: false
-  # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
-  # global max request number per second
-  # default tenant-level max request number
-  traffic-control:
-      global-switch: false
-      max-global-qps-rate: 300
-      tenant-switch: false
-      default-tenant-qps-rate: 10
-        #customize-tenant-qps-rate:
-        # eg.
-      #tenant1: 11
-      #tenant2: 20
-  python-gateway:
-    # Weather enable python gateway server or not. The default value is false.
-    enabled: false
-    # Authentication token for connection from python api to python gateway server. Should be changed the default value
-    # when you deploy in public network.
-    auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc
-    # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
-    # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
-    gateway-server-address: 0.0.0.0
-    # The port of Python gateway server start. Define which port you could connect to Python gateway server from
-    # Python API side.
-    gateway-server-port: 25333
-    # The address of Python callback client.
-    python-address: 127.0.0.1
-    # The port of Python callback client.
-    python-port: 25334
-    # Close connection of socket server if no other request accept after x milliseconds. Define value is (0 = infinite),
-    # and socket server would never close even though no requests accept
-    connect-timeout: 0
-    # Close each active connection of socket server if python program not active after x milliseconds. Define value is
-    # (0 = infinite), and socket server would never close even though no requests accept
-    read-timeout: 0
+audit:
+  enabled: false
 
 metrics:
   enabled: true
 
+python-gateway:
+  # Weather enable python gateway server or not. The default value is true.
+  enabled: true
+  # Authentication token for connection from python api to python gateway server. Should be changed the default value
+  # when you deploy in public network.
+  auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc
+  # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
+  # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
+  gateway-server-address: 0.0.0.0
+  # The port of Python gateway server start. Define which port you could connect to Python gateway server from
+  # Python API side.
+  gateway-server-port: 25333
+  # The address of Python callback client.
+  python-address: 127.0.0.1
+  # The port of Python callback client.
+  python-port: 25334
+  # Close connection of socket server if no other request accept after x milliseconds. Define value is (0 = infinite),
+  # and socket server would never close even though no requests accept
+  connect-timeout: 0
+  # Close each active connection of socket server if python program not active after x milliseconds. Define value is
+  # (0 = infinite), and socket server would never close even though no requests accept
+  read-timeout: 0
+
 security:
   authentication:
-    # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)
+    # Authentication types (supported types: PASSWORD,LDAP)
     type: PASSWORD
     # IF you set type `LDAP`, below config will be effective
     ldap:
@@ -188,50 +159,20 @@ security:
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
         not-exist-action: CREATE
-      ssl:
-        enable: false
-        # jks file absolute path && password
-        trust-store: "/ldapkeystore.jks"
-        trust-store-password: "password"
-    casdoor:
-      user:
-        admin: ""
-    oauth2:
-      enable: false
-      provider:
-        github:
-          authorizationUri: ""
-          redirectUri: ""
-          clientId: ""
-          clientSecret: ""
-          tokenUri: ""
-          userInfoUri: ""
-          callbackUrl: ""
-          iconUri: ""
-          provider: github
-        google:
-          authorizationUri: ""
-          redirectUri: ""
-          clientId: ""
-          clientSecret: ""
-          tokenUri: ""
-          userInfoUri: ""
-          callbackUrl: ""
-          iconUri: ""
-          provider: google
-casdoor:
-  # Your Casdoor server url
-  endpoint: ""
-  client-id: ""
-  client-secret: ""
-  # The certificate may be multi-line, you can use `|-` for ease
-  certificate: ""
-  # Your organization name added in Casdoor
-  organization-name: ""
-  # Your application name added in Casdoor
-  application-name: ""
-  # Doplhinscheduler login url
-  redirect-url: ""
+
+# Traffic control, if you turn on this config, the maximum number of request/s will be limited.
+# global max request number per second
+# default tenant-level max request number
+traffic:
+  control:
+    global-switch: false
+    max-global-qps-rate: 300
+    tenant-switch: false
+    default-tenant-qps-rate: 10
+    #customize-tenant-qps-rate:
+      # eg.
+      #tenant1: 11
+      #tenant2: 20
 
 
 # Override by profile

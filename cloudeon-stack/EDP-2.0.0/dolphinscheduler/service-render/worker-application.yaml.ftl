@@ -15,17 +15,27 @@
 # limitations under the License.
 #
 spring:
-  application:
-    name: worker-server
   banner:
     charset: UTF-8
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-  cloud.discovery.client.composite-indicator.enabled: false
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+    username: root
+    password: root
+    hikari:
+      connection-test-query: select 1
+      minimum-idle: 5
+      auto-commit: true
+      validation-timeout: 3000
+      pool-name: DolphinScheduler
+      maximum-pool-size: 50
+      connection-timeout: 30000
+      idle-timeout: 600000
+      leak-detection-threshold: 0
+      initialization-fail-timeout: 1
 
 registry:
   type: zookeeper
@@ -47,33 +57,26 @@ worker:
   # worker execute thread number to limit task instances in parallel
   exec-threads: 100
   # worker heartbeat interval
-  max-heartbeat-interval: 10s
+  heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
-  server-load-protection:
-    # If set true, will open worker overload protection
-    enabled: true
-    # Worker max system cpu usage, when the worker's system cpu usage is smaller then this value, worker server can be dispatched tasks.
-    max-system-cpu-usage-percentage-thresholds: 0.7
-    # Worker max jvm cpu usage, when the worker's jvm cpu usage is smaller then this value, worker server can be dispatched tasks.
-    max-jvm-cpu-usage-percentage-thresholds: 0.7
-    # Worker max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
-    max-system-memory-usage-percentage-thresholds: 0.7
-    # Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
-    max-disk-usage-percentage-thresholds: 0.7
+  # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
+  tenant-auto-create: true
+  #Scenes to be used for distributed users.For example,users created by FreeIpa are stored in LDAP.This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
+  tenant-distributed-user: false
+  # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value -1: the number of cpu cores * 2
+  max-cpu-load-avg: -1
+  # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
+  reserved-memory: 0.3
+  # alert server listen host
+  alert-listen-host: localhost
+  alert-listen-port: 50052
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
     strategy: waiting
     # The max waiting time to reconnect to registry if you set the strategy to waiting
     max-waiting-time: 100s
   task-execute-threads-full-policy: REJECT
-  tenant-config:
-    # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
-    auto-create-tenant-enabled: true
-    # Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, auto-create-tenant-enabled has no effect and will not automatically create tenants.
-    distributed-tenant-enabled: false
-    # If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`.
-    default-tenant-enabled: false
 
 server:
   port: ${conf['worker.server.port']}
@@ -82,7 +85,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,metrics,prometheus
+        include: '*'
   endpoint:
     health:
       enabled: true
@@ -98,4 +101,16 @@ management:
 
 metrics:
   enabled: true
+
 # Override by profile
+
+---
+spring:
+  config:
+    activate:
+      on-profile: mysql
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${conf['jdbc.mysql.address']}
+    username: ${conf['jdbc.mysql.username']}
+    password: ${conf['jdbc.mysql.password']}
