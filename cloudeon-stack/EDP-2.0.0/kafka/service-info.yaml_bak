@@ -1,7 +1,10 @@
 name: KAFKA
 label: "Kafka"
 description: "Kafka分布式事件流系统"
-version: 4.0.0
+version: 2.8.2
+
+dependencies:
+  - "ZOOKEEPER"
 
 supportKerberos: false
 
@@ -22,7 +25,7 @@ customConfigFiles:
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/kafka:4.0.0"
+    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/kafka:2.8.2"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"
@@ -216,3 +219,11 @@ configurations:
     confFile:  "server.properties"
     unit: ms
     tag: "性能"
+  - name: "zookeeper.connection.timeout.ms"
+    recommendExpression: "18000"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "Zookeeper连接超时时长"
+    confFile:  "server.properties"
+    unit: Ms
+    tag: "高级参数"

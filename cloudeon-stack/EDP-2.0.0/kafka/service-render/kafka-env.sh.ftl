@@ -8,5 +8,9 @@ export directRam=$[ $MEM_LIMIT / 1024 / 1024  * ${directRamPercentage} / 100 ]M
 export JMX_PORT=${conf['kafka.jmx.port']}
 export KAFKA_HEAP_OPTS="-Xmx$heapRam -Xms$heapRam -XX:MaxDirectMemorySize=$directRam"
 
+<#--如果选择JDK8版本-->
+<#--export KAFKA_OPTS="$KAFKA_OPTS -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent.jar=5551:$KAFKA_HOME/config/jmx_prometheus.yaml"-->
+<#--export KAFKA_OPTS="$KAFKA_OPTS -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/workspace/logs/gc-kafka-broker.log"-->
+<#--如果选择JDK17版本-->
 export KAFKA_OPTS="$KAFKA_OPTS -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent.jar=5551:$KAFKA_HOME/config/jmx_prometheus.yaml"
-export KAFKA_OPTS="$KAFKA_OPTS -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/workspace/logs/gc-kafka-broker.log"
+export KAFKA_OPTS="$KAFKA_OPTS -Xlog:gc*:file=/workspace/logs/gc-kafka-broker.log:time,tags,uptime,pid:filecount=10,filesize=10M"

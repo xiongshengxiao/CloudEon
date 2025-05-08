@@ -1,3 +1,66 @@
+# CloudEon集成Kafka4.0.0&3.9.0-KRaft模式
+
+## 前言
+
+==部署KRaft模式需要进行初始化Kafka集群。==
+
+Kafka4.0.0和Kafka3.9.0通过CloudEon使用Kubernetes部署KRaft模式皆可参考一下步骤。
+
+## 克隆CloudEon源码
+
+```shell
+git clone https://gitclone.com/github.com/dromara/CloudEon.git
+```
+
+## 修改相关配置文件
+
+### Dockerfile
+
+==该文件存在于docker路径下==
+
+`如果集成Kafka的是3.9.0版本，可以考虑进行继续基于JDK8构建镜像`
+
+`如果集成Kafka的是4.0.0版本，必须基于JDK11+构建镜像。最好是JDK17`
+
+```shell
+# FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:8-ubuntu
+FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:17
+
+
+ENV KAFKA_HOME=/opt/kafka \
+    # KAFKA_VERSION=3.9.0
+    KAFKA_VERSION=4.0.0
+ENV PATH=${PATH}:${KAFKA_HOME}/bin
+
+# 安装 bash
+# RUN apk add --no-cache bash
+
+# RUN wget https://mirrors.huaweicloud.com/apache/kafka/${KAFKA_VERSION}/kafka_2.12-${KAFKA_VERSION}.tgz \
+RUN wget https://mirrors.aliyun.com/apache/kafka/${KAFKA_VERSION}/kafka_2.13-${KAFKA_VERSION}.tgz \
+    && tar -zxvf kafka*.tgz -C /opt \
+    && mv /opt/kafka* $KAFKA_HOME \
+    && rm -f kafka*.tgz
+
+# 生成 cluster_id 并写入文件
+RUN $KAFKA_HOME/bin/kafka-storage.sh random-uuid > /cluster_id.txt
+
+WORKDIR $KAFKA_HOME
+
+```
+
+>说明：在构建镜像的时候可以把先生成一个唯一的集群ID赋值到cluster_id.txt，后续格式化存储目录时需要用到。
+>
+>需要注意的是：**不要将cluster_id.txt生成到Kafka路径**，后面部署的时候Kafka路径下疑似**被覆盖找不到**。
+>
+>Kubernetes关于Kafka应该是做了挂载，所以会导致cluster_id.txt消失。如果你对Kubernetes不是很透，建议跟我一样生成到其他路径。已替你们踩好坑
+
+### grafana-dashboard.yaml.ftl
+
+==该文件存在于kube-prometheus-render路径下==
+
+`删除Zookeeper相关的配置。删除2619~3117行相关Zookeeper的内容`
+
+```shell
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -6597,3 +6660,373 @@ data:
       "weekStart": ""
     }
     </#noparse>
+```
+
+### bootstrap.sh
+
+==该文件存在于service-common路径下==
+
+`添加格式化目录的操作`
+
+```shell
+#!/bin/bash
+set -e
+
+mkdir -p /workspace/logs
+
+\cp -f /opt/service-render-output/* $KAFKA_HOME/config/
+
+## 打印调试信息
+#echo "当前工作目录: $(pwd)"
+#echo "KAFKA_HOME: $KAFKA_HOME"
+#
+#echo "查找文件"
+#ls -l /
+#ls -l /cluster_id.txt
+
+# 从 cluster_id.txt 文件中读取 CLUSTER_ID
+if [[ -f "/cluster_id.txt" ]]; then
+    CLUSTER_ID=$(cat /cluster_id.txt | tr -d '\r\n')
+    echo "Cluster ID 读取成功: $CLUSTER_ID"
+else
+    echo "错误：未找到 cluster_id.txt 文件，请检查路径 /cluster_id.txt"
+    exit 1
+fi
+
+# 格式化存储目录
+$KAFKA_HOME/bin/kafka-storage.sh format -t "$CLUSTER_ID" -c $KAFKA_HOME/config/server.properties
+#bin/kafka-storage.sh format --standalone -t $CLUSTER_ID -c config/server.properties
+
+# 加载环境变量
+source $KAFKA_HOME/config/kafka-env.sh
+# 启动Kafka
+$KAFKA_HOME/bin/kafka-server-start.sh $KAFKA_HOME/config/server.properties
+
+echo "---------------------------------------------开始----------------------------------------------"
+tail -f /dev/null
+
+# 功能测试，不会自动执行
+
+kafka-topics.sh --zookeeper $HOSTNAME:$ZK_CLIENT_PORT/kafka --create --topic t1 --partitions 1 --replication-factor 1
+kafka-topics.sh --zookeeper $HOSTNAME:$ZK_CLIENT_PORT/kafka --list
+
+kafka-console-producer.sh --bootstrap-server $HOSTNAME:$KAFKA_PORT --topic t1
+kafka-console-consumer.sh --bootstrap-server $HOSTNAME:$KAFKA_PORT --from-beginning  --topic t1
+```
+
+### kafka-env.sh.ftl【可选】
+
+==该文件位于service-render路径下==
+
+`根据你选择的JDK版本，选择相关的JDK启动配置`
+
+```shell
+export LOG_DIR="/workspace/logs"
+<#assign heapRamPercentage = conf['kafka.server.heap.memory.percentage']?number>
+<#assign directRamPercentage = conf['kafka.server.direct.memory.percentage']?number>
+export heapRam=$[ $MEM_LIMIT / 1024 / 1024  * ${heapRamPercentage} / 100 ]M
+export directRam=$[ $MEM_LIMIT / 1024 / 1024  * ${directRamPercentage} / 100 ]M
+
+# 环境变量由kafka-run-class.sh注入
+export JMX_PORT=${conf['kafka.jmx.port']}
+export KAFKA_HEAP_OPTS="-Xmx$heapRam -Xms$heapRam -XX:MaxDirectMemorySize=$directRam"
+
+<#--如果选择JDK8版本-->
+<#--export KAFKA_OPTS="$KAFKA_OPTS -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent.jar=5551:$KAFKA_HOME/config/jmx_prometheus.yaml"-->
+<#--export KAFKA_OPTS="$KAFKA_OPTS -XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:/workspace/logs/gc-kafka-broker.log"-->
+<#--如果选择JDK17版本-->
+export KAFKA_OPTS="$KAFKA_OPTS -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent.jar=5551:$KAFKA_HOME/config/jmx_prometheus.yaml"
+export KAFKA_OPTS="$KAFKA_OPTS -Xlog:gc*:file=/workspace/logs/gc-kafka-broker.log:time,tags,uptime,pid:filecount=10,filesize=10M"
+```
+
+### server.properties.ftl
+
+==该文件位于service-render路径下==
+
+`新增：KRaft 模式相关配置并写死log.dirs参数项`
+
+```shell
+<#if conf["data.path.list"]?? && conf["data.path.list"]?trim?has_content>
+    <#assign dataPathListSize=conf["data.path.list"]?trim?split(",")?size>
+<#else>
+    <#assign dataPathListSize=1>
+</#if>
+
+<#assign hosts=serviceRoles['KAFKA_BROKER']>
+<#list hosts as host>
+    <#if host.hostname == HOSTNAME>
+        broker.id=${host.id % 254 + 1}
+        node.id=${host.id % 254 + 1}
+    </#if>
+</#list>
+
+<#--<#assign concatenatedPaths="">-->
+<#--<#list 1..dataPathListSize as dataPathIndex>-->
+<#--    <#assign concatenatedPaths = concatenatedPaths + "/data/${dataPathIndex}">-->
+<#--    <#if dataPathIndex < dataPathListSize>-->
+<#--        <#assign concatenatedPaths = concatenatedPaths + ",">-->
+<#--    </#if>-->
+<#--</#list>-->
+<#--log.dirs=${concatenatedPaths}-->
+log.dirs=/data/kafka
+
+listeners=PLAINTEXT://${HOSTNAME}:${conf['kafka.listeners.port']},CONTROLLER://${HOSTNAME}:9093
+listener.security.protocol.map=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+<#--advertised.listeners=PLAINTEXT://${HOSTNAME}:${conf['kafka.listeners.port']}-->
+
+<!-- 新增：KRaft 模式相关配置 -->
+process.roles=broker,controller
+controller.quorum.voters=<#list hosts as host>${host.id % 254 + 1}@${host.hostname}:9093<#if host_has_next>,</#if></#list>
+controller.listener.names=CONTROLLER
+
+<#--启用控制器选举，确保集群的稳定性。-->
+controller-election.enable=true
+
+<#list confFiles['server.properties']?keys as key>
+    ${key}=${confFiles['server.properties'][key]}
+</#list>
+```
+
+>注意：这里不推荐使用原先通过FreeMarker 模板动态生成 Kafka 的 `log.dirs` 配置项。如果部署的是多节点，那么会导致多次格式化目录报错。推荐直接写死log.dirs。
+
+### service-info.yaml
+
+==该文件直接位于Kafka路径下==
+
+`删除Zookeeper相关配置项`
+
+```shell
+name: KAFKA
+label: "Kafka"
+description: "Kafka分布式事件流系统"
+version: 3.9.0
+
+supportKerberos: false
+
+dashboard:
+  uid: "kafka001"
+
+roles:
+  - name: KAFKA_BROKER
+    label: "Kafka Broker"
+    roleFullName: "kafka-broker"
+    sortNum: 1
+    type: DEPLOYMENT
+    minNum : 1
+
+customConfigFiles:
+  - server.properties
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/kafka:3.9.0"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: "kafka.listeners.port"
+    recommendExpression: 9092
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Kafka监听端口"
+    tag: "端口"
+  - name: "kafka.jmx.port"
+    recommendExpression: 9921
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Kafka JMX监听端口"
+    tag: "端口"
+  - name: kafka.container.limit.cpu
+    description: "Kafka Server容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kafka.container.limit.memory
+    description: "Kafka Server容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kafka.container.request.cpu
+    description: "Kafka Server容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kafka.container.request.memory
+    description: "Kafka Server容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kafka.server.heap.memory.percentage
+    description: "Kafka Server 堆内存占容器内存限额的百分比，用于Kafka jvm，需预留内存供pagecache使用"
+    recommendExpression: 25
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: kafka.server.direct.memory.percentage
+    description: "Kafka Server 直接内存占容器内存限额的百分比，用于Kafka 网络IO，需预留内存供pagecache使用"
+    recommendExpression: 25
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: "num.partitions"
+    recommendExpression: 8
+    valueType: InputNumber
+    confFile:  "server.properties"
+    description: "Kafka分区数"
+    tag: "常用参数"
+  - name: "offsets.topic.replication.factor"
+    recommendExpression: 2
+    valueType: InputNumber
+    confFile:  "server.properties"
+    description: "内置Topic副本数"
+    tag: "常用参数"
+  - name: "default.replication.factor"
+    recommendExpression: 2
+    valueType: InputNumber
+    confFile:  "server.properties"
+    description: "Topic副本数"
+    tag: "常用参数"
+  - name: "log.retention.hours"
+    recommendExpression: 168
+    valueType: InputNumber
+    confFile:  "server.properties"
+    description: "数据保留时间"
+    unit: Hour
+    tag: "常用参数"
+  - name: "auto.create.topics.enable"
+    recommendExpression: "false"
+    valueType: Switch
+    configurableInWizard: true
+    description: 是否允许自动创建Topic
+    confFile:  "server.properties"
+    tag: "常用参数"
+  - name: "unclean.leader.election.enable"
+    recommendExpression: "false"
+    valueType: Switch
+    configurableInWizard: true
+    description: "是否允许Unclean Leader选举"
+    confFile:  "server.properties"
+    tag: "高级参数"
+  - name: "auto.leader.rebalance.enable"
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: true
+    description: "是否允许Leader重平衡"
+    confFile:  "server.properties"
+    tag: "高级参数"
+  - name: "message.max.bytes"
+    recommendExpression: "1000012"
+    valueType: InputNumber
+    configurableInWizard: true
+    unit: bytes
+    description: "Broker能够接收的一条消息最大大小"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "message.max.bytes"
+    recommendExpression: "1048576"
+    valueType: InputNumber
+    configurableInWizard: true
+    unit: bytes
+    description: "kafka接收单个消息size的最大限制,默认为1M左右 message.max.bytes必须小于等于replica.fetch.max.bytes"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "num.network.threads"
+    recommendExpression: "3"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "server用来处理网络请求的网络线程数目"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "num.io.threads"
+    recommendExpression: "12"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "server用来处理请求的I/O线程的数目；这个线程数目至少要等于硬盘的个数。"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "queued.max.requests"
+    recommendExpression: "500"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "在网络线程停止读取新请求之前，可以排队等待I/O线程处理的最大请求个数"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "socket.receive.buffer.bytes"
+    recommendExpression: "102400"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "socket接收服务的缓存区大小"
+    confFile:  "server.properties"
+    unit: bytes
+    tag: "性能"
+  - name: "socket.send.buffer.bytes"
+    recommendExpression: "102400"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "socket发送服务的缓存区大小"
+    confFile:  "server.properties"
+    unit: bytes
+    tag: "性能"
+  - name: "socket.request.max.bytes"
+    recommendExpression: "102857600"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "socket每次请求的最大字节数"
+    confFile:  "server.properties"
+    unit: bytes
+    tag: "性能"
+  - name: "log.flush.interval.messages"
+    recommendExpression: "1000000"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "在将消息刷新到磁盘之前，日志分区上累积的消息数，该值将影响PageCache的大小"
+    confFile:  "server.properties"
+    tag: "性能"
+  - name: "log.flush.interval.ms"
+    recommendExpression: "10000"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "任何主题中的消息在刷新到磁盘之前保存在内存中的最长时间(以毫秒为单位)，该值将影响PageCache的大小"
+    confFile:  "server.properties"
+    unit: ms
+    tag: "性能"
+  - name: "log.flush.scheduler.interval.ms"
+    recommendExpression: "10000"
+    valueType: InputNumber
+    configurableInWizard: false
+    description: "日志刷新程序检查是否需要将日志刷新到磁盘的频率(以毫秒为单位)，该值将影响PageCache的大小"
+    confFile:  "server.properties"
+    unit: ms
+    tag: "性能"
+
+```
+
+## 构建镜像
+
+```shell
+docker build -t kafka:4.0.0 . --no-cache
+```
+
+## 安装
+
+略
+
+## 拓展
+
+>如果Cloudeon集成高版本Kafka-Zookeeper模式，比如安装Kafka3.9.0基于Zookeeper存储元数据，在源码的基础直接修改Dockerfile文件更改Kafka构建镜像安装即可。

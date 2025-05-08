@@ -1,2 +1,2 @@
-docker build -t registry.cn-guangzhou.aliyuncs.com/bigdata200/kafka:2.8.2 .
-docker push  registry.cn-guangzhou.aliyuncs.com/bigdata200/kafka:2.8.2
+docker build -t registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/kafka:4.0.0 .
+docker push  registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/kafka:4.0.0
