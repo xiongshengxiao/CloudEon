@@ -137,7 +137,9 @@ public abstract class RoleK8sTask extends BaseCloudeonTask implements ApplyOrDel
                 }
             } else {
                 try {
-                    long waitSeconds = 600;
+                    // 超时时间，JOB、HELM_CHART、DEPLOYMENT、UNKNOWN这些操作在 600 秒（10分钟）内没有完成，系统会抛出超时异常
+                    // long waitSeconds = 600;
+                    long waitSeconds = 1800;
                     switch (roleType) {
                         case JOB:
                             Job job = client.batch().v1().jobs().load(IoUtil.toUtf8Stream(modelYamlStr)).item();
