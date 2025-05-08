@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# 创建必要的目录
+mkdir -p /workspace/logs
+
+echo "测试输出"
+ls /opt/
+echo "测试输出"
+ls /opt/datax
+# 检查目标目录是否存在
+if [ ! -d "$DATAX_WEB_HOME/modules" ]; then
+    echo "Error: $DATAX_WEB_HOME/modules directory does not exist"
+    exit 1
+fi
+# 复制配置文件
+\cp -f /opt/service-render/bootstrap-properties.ftl $DATAX_WEB_HOME/modules/datax-admin/conf/bootstrap.properties
+\cp -f /opt/service-render/admin-env-properties.ftl $DATAX_WEB_HOME/modules/datax-admin/bin/env.properties
+\cp -f /opt/service-render/executor-env-properties.ftl $DATAX_WEB_HOME/modules/datax-executor/bin/env.properties
+
+# 计算JVM内存配置
+# 获取容器内存限制（MB）
+CONTAINER_MEMORY_LIMIT_MB=${conf['datax.web.container.limit.memory']}
+# 计算JVM堆内存大小（MB）
+JVM_HEAP_MEMORY_MB=$((CONTAINER_MEMORY_LIMIT_MB * ${conf['datax.web.jvm.memory.percentage']} / 100))
+# 计算Metaspace内存大小（MB）
+METASPACE_MEMORY_MB=$((CONTAINER_MEMORY_LIMIT_MB * ${conf['datax.web.metaspace.memory.percentage']} / 100))
+
+# 设置datax-admin的JVM参数
+export DATAX_ADMIN_JAVA_OPTS="-Xms${JVM_HEAP_MEMORY_MB}m -Xmx${JVM_HEAP_MEMORY_MB}m -XX:MetaspaceSize=${METASPACE_MEMORY_MB}m -XX:MaxMetaspaceSize=${METASPACE_MEMORY_MB}m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+
+# 设置datax-executor的JVM参数
+export DATAX_EXECUTOR_JAVA_OPTS="-Xms${JVM_HEAP_MEMORY_MB}m -Xmx${JVM_HEAP_MEMORY_MB}m -XX:MetaspaceSize=${METASPACE_MEMORY_MB}m -XX:MaxMetaspaceSize=${METASPACE_MEMORY_MB}m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8"
+
+
+# 修改启动脚本
+# 修改datax-admin.sh
+sed -i 's/if \[\[ ! \${JAVA_OPTS} \]\]; then/if \[\[ ! \${JAVA_OPTS} \]\]; then\n    JAVA_OPTS="${DATAX_ADMIN_JAVA_OPTS}"/' $DATAX_WEB_HOME/modules/datax-admin/bin/datax-admin.sh
+
+# 修改datax-executor.sh
+sed -i 's/if \[\[ ! \${JAVA_OPTS} \]\]; then/if \[\[ ! \${JAVA_OPTS} \]\]; then\n    JAVA_OPTS="${DATAX_EXECUTOR_JAVA_OPTS}"/' $DATAX_WEB_HOME/modules/datax-executor/bin/datax-executor.sh
+
+# 检查数据库是否存在
+if mysql -u${conf['MysqlUserName']} -P${conf['MysqlPort']} -p${conf['MysqlPassword']} -h${conf['MysqlHostname']} -e "SHOW DATABASES LIKE '${conf['MysqlDatabase']}';" | grep "${conf['MysqlDatabase']}" > /dev/null
+then
+    echo "数据库已存在"
+else
+    echo "数据库不存在"
+    # 创建数据库
+    mysql -u${conf['MysqlUserName']} -P${conf['MysqlPort']} -p${conf['MysqlPassword']} -h${conf['MysqlHostname']} -e "CREATE DATABASE ${conf['MysqlDatabase']};"
+    echo "数据库已创建"
+    # 执行 SQL 脚本
+    mysql -u${conf['MysqlUserName']} -P${conf['MysqlPort']} -p${conf['MysqlPassword']} -h${conf['MysqlHostname']} -D${conf['MysqlDatabase']} < $DATAX_WEB_HOME/bin/db/datax-web.sql
+fi
+
+# 启动DataX Web服务
+cd $DATAX_WEB_HOME
+./bin/start-all.sh
+
+# 保持容器运行
+tail -f /workspace/logs/datax-web.log 

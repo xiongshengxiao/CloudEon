@@ -1,0 +1,28 @@
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/datax:3.0.0
+
+# 安装必要的工具
+RUN apt-get update && apt-get install -y mysql-client
+
+# 设置环境变量
+ENV DATAX_HOME="/opt/datax"
+ENV DATAX_WEB_VERSION="2.1.2"
+ENV DATAX_WEB_HOME="/opt/datax-web"
+ENV PATH=$PATH:$DATAX_WEB_HOME/bin
+ENV PYTHON_PATH="$DATAX_HOME/bin/datax.py"
+
+# 复制 DataX_Web 文件
+ADD datax-web-${DATAX_WEB_VERSION}.tar.gz /opt/
+
+RUN mv /opt/datax-web-* $DATAX_WEB_HOME
+
+# 执行安装脚本并验证安装结果
+RUN chmod +x $DATAX_WEB_HOME/bin/install.sh && \
+    { echo "y"; } | $DATAX_WEB_HOME/bin/install.sh --force && \
+    # 验证安装结果
+    test -d "$DATAX_WEB_HOME/modules" || { echo "Installation failed: modules directory not created"; exit 1; }
+
+# 暴露端口
+EXPOSE 8080 9999
+
+# 设置工作目录
+WORKDIR $DATAX_WEB_HOME

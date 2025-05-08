@@ -1,0 +1,169 @@
+name: DATAX
+label: "DataX"
+description: "阿里巴巴开源数据同步工具"
+version: 3.0.0-2.1.2
+dependencies:
+  - "GLOBAL"
+
+supportKerberos: false
+
+dashboard:
+  uid: "datax001"
+
+roles:
+  - name: DATAX_WEB
+    label: "DataX Web"
+    roleFullName: "datax-web"
+    sortNum: 1
+    type: Deployment
+    minNum: 1
+    needOdd: false
+    linkExpression: "http://${localhostname}:${conf['datax.web.port']}/index.html"
+
+customConfigFiles: []
+
+configurations:
+  - name: webImage
+    description: "DataX Web服务镜像"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/datax:3.0.0-2.1.2"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+  - name: serverImage
+    description: "DataX服务镜像"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/datax:3.0.0"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: jvm.heap.memory.percentage
+    description: "dinky容器jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 50
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: jvm.perm_size.memory.percentage
+    description: "dinky容器jvm perm_size内存占容器内存限额的百分比"
+    recommendExpression: 30
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: resources.requests.cpu
+    recommendExpression: 0.1
+    needChangeInWizard: false
+    valueType: InputNumber
+    description: "容器请求CPU"
+    tag: "资源管理"
+    configurableInWizard: true
+  - name: resources.limits.cpu
+    recommendExpression: 1.0
+    needChangeInWizard: false
+    valueType: InputNumber
+    description: "容器限制CPU"
+    tag: "资源管理"
+    configurableInWizard: true
+  - name: resources.requests.memory
+    recommendExpression: 256
+    needChangeInWizard: false
+    valueType: InputNumber
+    unit: Mi
+    description: "容器请求内存，单位MB"
+    tag: "资源管理"
+    configurableInWizard: true
+  - name: resources.limits.memory
+    recommendExpression: 2048
+    needChangeInWizard: false
+    valueType: InputNumber
+    unit: Mi
+    description: "容器限制内存，单位MB"
+    tag: "资源管理"
+    configurableInWizard: true
+
+  - name: "datax.web.port"
+    recommendExpression: "9527"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "datax web 端口"
+    tag: "端口"
+  - name: "executor.port"
+    recommendExpression: "9999"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "executor_port(执行器）的默认端口"
+    tag: "端口"
+  - name: datax_web.jmx.port
+    recommendExpression: 2192
+    valueType: InputNumber
+    description: "DataX_Web jmx端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: "MysqlHostname"
+    recommendExpression: "localhost"
+    valueType: InputString
+    configurableInWizard: true
+    description: "web程序mysql数据库hostname"
+    needChangeInWizard: false
+    tag: "常用参数"
+  - name: "MysqlPort"
+    recommendExpression: "3306"
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "web程序mysql数据库端口"
+    needChangeInWizard: false
+    tag: "端口"
+  - name: "MysqlUserName"
+    recommendExpression: "root"
+    valueType: InputString
+    configurableInWizard: true
+    description: "web程序mysql数据库用户名"
+    needChangeInWizard: false
+    tag: "常用参数"
+  - name: "MysqlPassword"
+    recommendExpression: "xxx"
+    valueType: InputString
+    configurableInWizard: true
+    description: "web程序mysql数据库用户密码"
+    needChangeInWizard: true
+    tag: "常用参数"
+  - name: "MysqlDatabase"
+    recommendExpression: "dataxweb"
+    valueType: InputString
+    configurableInWizard: true
+    description: "web程序mysql数据库名称"
+    needChangeInWizard: false
+    tag: "常用参数"
+
+  - name: "PYTHON_PATH"
+    recommendExpression: "/opt/datax/bin/datax.py"
+    valueType: InputString
+    configurableInWizard: true
+    description: "DataX中PYTHON脚本执行位置"
+    needChangeInWizard: false
+    tag: "常用参数"
+
+  - name: "MAIL_USERNAME"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    description: "告警邮箱账号"
+    needChangeInWizard: false
+    tag: "邮箱"
+  - name: "MAIL_PASSWORD"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    description: "告警邮箱密码"
+    needChangeInWizard: false
+    tag: "邮箱"
