@@ -25,7 +25,7 @@ customConfigFiles: []
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/datavines:1.0.0"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/datavines:1.0.0"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"
