@@ -13,7 +13,9 @@ mkdir -p /workspace/filebeat/inputs/
 \cp -f /opt/service-render-output/* $DORIS_HOME/be/conf/
 
 # 设置系统参数
-sysctl -w vm.max_map_count=2000000
+# sysctl -w vm.max_map_count=2000000
+echo 'vm.max_map_count = 2000000' >> /etc/sysctl.conf
+sysctl -p
 
 # 定义辅助函数
 check_fe_status() {

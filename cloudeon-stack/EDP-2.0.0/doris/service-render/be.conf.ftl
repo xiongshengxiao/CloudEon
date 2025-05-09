@@ -1,5 +1,5 @@
 <#list confFiles['be.conf']?keys as key>
-    ${key}=${confFiles['be.conf'][key]}
+${key}=${confFiles['be.conf'][key]}
 </#list>
 CUR_DATE=`date +%Y%m%d-%H%M%S`
 

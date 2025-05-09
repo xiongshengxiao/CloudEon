@@ -9,11 +9,13 @@ mkdir -p /data/starrocks/be/storage
 # 复制配置文件
 mkdir -p /workspace/filebeat/inputs/
 \cp -f /opt/service-render-output/filebeat.input.yml /workspace/filebeat/inputs/
-\cp -f /opt/service-render-output/* $STARROCKS_HOME/fe/conf/
-\cp -f /opt/service-render-output/* $STARROCKS_HOME/be/conf/
+\cp -f /opt/service-render-output/fe.conf $STARROCKS_HOME/fe/conf/
+\cp -f /opt/service-render-output/be.conf $STARROCKS_HOME/be/conf/
 
 # 设置系统参数
-sysctl -w vm.max_map_count=2000000
+# sysctl -w vm.max_map_count=2000000
+echo 'vm.max_map_count = 2000000' >> /etc/sysctl.conf
+sysctl -p
 
 # 定义辅助函数
 check_fe_status() {

@@ -14,7 +14,7 @@ JAVA_OPTS="-Dlog4j2.formatMsgNoLookups=true -Xmx${serverHeap}m -XX:+UseG1GC -Xlo
 sys_log_level = INFO
 
 <#list confFiles['fe.conf']?keys as key>
-    ${key}=${confFiles['fe.conf'][key]}
+${key}=${confFiles['fe.conf'][key]}
 </#list>
 
 priority_networks = ${nodeInfo[HOSTNAME].ip}/24

@@ -24,7 +24,7 @@ sys_log_mode = NORMAL
 meta_dir =  /data/1/meta
 
 <#list confFiles['fe.conf']?keys as key>
-    ${key}=${confFiles['fe.conf'][key]}
+${key}=${confFiles['fe.conf'][key]}
 </#list>
 
 
