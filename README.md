@@ -1,7 +1,10 @@
 <div align="center">
 <h1>Dromara CloudEon云原生大数据平台</h1>
+
 [![GitHub Pull Requests](https://img.shields.io/github/stars/dromara/CloudEon)](https://github.com/dromara/CloudEon/stargazers)
-[![Gitee Star](https://raw.githubusercontent.com/xiongshengxiao/MyPicGo/img/img/star.svg)](https://gitee.com/dromara/CloudEon/stargazers)
+[![Gitee Star](https://gitee.com/dromara/cloudeon/badge/star.svg?theme=gvp)](https://gitee.com/dromara/CloudEon/stargazers)
+
+
 
 [![HitCount](https://views.whatilearened.today/views/github/dromara/CloudEon.svg)](https://github.com/dromara/CloudEon)
 [![Commits](https://img.shields.io/github/commit-activity/m/dromara/CloudEon?color=ffff00)](https://github.com/dromara/CloudEon/commits/main)
@@ -71,6 +74,7 @@ CloudEon 是基于 Kubernetes 的资源安装部署开源大数据组件，实�
 |  25  |          Kylin           |        5.0.0         |                    大数据开源OLAP 引擎                     |
 |  26  |          Trino           |         424          |            离线数据仓库分布式Sql交互式查询引擎             |
 |  27  |          Kyuubi          |        1.7.0         |                  分布式和多租户的SQL网关                   |
+|  28  |           Solr           |        8.11.4        |                    企业级的搜索引擎系统                    |
 
 >注：排名不分先后
 
@@ -91,7 +95,7 @@ CloudEon 是基于 Kubernetes 的资源安装部署开源大数据组件，实�
 - [ ] 集成Redis8.0.0(想法中)
 - [ ] 集成Superset(想法中)
 - [ ] 集成Ranger权限控制框架(在办)
-- [ ] 集成Solr(在办)
+- [x] 集成Solr
 - [ ] ......
 
 ## 🤗 另外
