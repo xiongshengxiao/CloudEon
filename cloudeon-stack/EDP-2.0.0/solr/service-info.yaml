@@ -1,0 +1,202 @@
+name: SOLR
+label: "solr"
+description: "企业级的搜索引擎系统"
+# 版本号
+version: 8.11.4
+
+dependencies:
+  - "GLOBAL"
+  - "HDFS"
+  - "ZOOKEEPER"
+
+supportKerberos: false
+
+# grafana面板的uid，需与实际要注入的grafana面板uid匹配，可设置为""关闭监控面板
+dashboard:
+  uid: "solr001"
+
+roles:
+  # 角色名称
+  - name: SOLR_SERVER
+    # 角色用于显示的名称
+    label: "Solr Server"
+    # 角色全名，用于注入k8s作为标识
+    roleFullName: "solr-server"
+    # 访问链接，localhostname会被替换成真实的hostname或ip
+    linkExpression: "http://${localhostname}:${conf['solr.port']}/solr/#/"
+    sortNum: 1
+    # 角色类型，目前支持JOB、HELM_CHART、DEPLOYMENT、EMPTY（不会试图生成对应k8s资源）
+    type: DEPLOYMENT
+    # 是否需要奇数节点数
+    needOdd: true
+    # 最小节点数
+    minNum: 3
+
+# 自定义配置文件
+# 用户部署的时候可以给这些文件添加key-value，组件开发者需将这些key-value添加到对应文件里
+customConfigFiles:
+  - solr.xml
+
+# 自定义配置项，是模型变量的主要来源
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/solr:8.11.4"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: solr.port
+    description: "solr Server端口"
+    recommendExpression: 8983
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: solr.heap
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    description: "Apache Solr 应用程序堆内存大小的环境变量"
+    tag: "常用参数"
+
+  - name: solr.container.limit.cpu
+    description: "solr Server容器的CPU使用限额"
+    recommendExpression: 2.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: solr.container.limit.memory
+    description: "solr Server容器的内存使用限额，单位MB"
+    recommendExpression: 4096
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: solr.container.request.cpu
+    description: "solr Server容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: solr.container.request.memory
+    description: "solr Server容器的内存请求量，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: solr.metrics.port
+    description: "solr Server 监控端口"
+    recommendExpression: 9854
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "端口"
+
+  - name: metrics
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: true
+    description: "Solr 监控"
+    confFile: "solr.xml"
+    tag: "常用参数"
+
+  - name: maxBooleanClauses
+    recommendExpression: 1024
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "用于限制布尔查询中可以使用的最大子句数"
+    confFile: "solr.xml"
+    tag: "常用参数"
+
+  - name: solr.solrcloud.hostContext
+    recommendExpression: "solr"
+    valueType: InputString
+    configurableInWizard: true
+    description: "Solr URL 上下文路径"
+    confFile: "solr.xml"
+    tag: "常用参数"
+
+  - name: solr.solrcloud.genericCoreNodeNames
+    recommendExpression: "true"
+    valueType: Switch
+    configurableInWizard: true
+    description: "Solr 默认节点名称不是基于节点的地址，而是基于标识核心的通用名称"
+    confFile: "solr.xml"
+    tag: "常用参数"
+
+  - name: solr.solrcloud.zkClientTimeout
+    recommendExpression: 30000
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Solr 设置ZooKeeper 服务器连接的超时时间"
+    confFile: "solr.xml"
+    tag: "常用参数"
+
+  - name: solr.solrcloud.distribUpdateSoTimeout
+    recommendExpression: 600000
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Solr 集群内部更新的 socket 连接超时时间"
+    confFile: "solr.xml"
+    tag: "常用参数"
+
+  - name: solr.solrcloud.distribUpdateConnTimeout
+    recommendExpression: 60000
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Solr 集群内部更新的连接超时时间"
+    confFile: "solr.xml"
+    tag: "常用参数"
+
+#  - name: solr.solrcloud.zkCredentialsProvider
+#    recommendExpression: "org.apache.solr.common.cloud.DefaultZkCredentialsProvider"
+#    valueType: InputString
+#    configurableInWizard: true
+#    description: "Solr 用于设置 Zookeeper 访问控制"
+#    confFile: "solr.xml"
+#    tag: "常用参数"
+
+#  - name: solr.solrcloud.zkACLProvider
+#    recommendExpression: "org.apache.solr.common.cloud.DefaultZkACLProvider"
+#    valueType: InputString
+#    configurableInWizard: true
+#    description: "Solr 用于设置 Zookeeper 访问控制"
+#    confFile: "solr.xml"
+#    tag: "常用参数"
+
+  - name: solr.shardHandlerFactory.socketTimeout
+    recommendExpression: 600000
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Solr 群集内查询和管理类请求的读取超时时间"
+    confFile: "solr.xml"
+    tag: "常用参数"
+
+  - name: solr.shardHandlerFactory.connTimeout
+    recommendExpression: 60000
+    valueType: InputNumber
+    configurableInWizard: true
+    description: "Solr 群集内查询和管理类请求的连接超时时间"
+    confFile: "solr.xml"
+    tag: "常用参数"
+
+  - name: solr.shardHandlerFactory.shardsWhitelist
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    description: "Solr 在非集群模型下执行分布式搜索的 Solr 服务白名单列表"
+    confFile: "solr.xml"
+    tag: "常用参数"

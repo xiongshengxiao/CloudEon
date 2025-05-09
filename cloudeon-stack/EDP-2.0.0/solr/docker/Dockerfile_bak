@@ -1,0 +1,20 @@
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/hadoop-jdk11:3.3.4
+
+# 新增solr组件
+ENV SOLR_VERSION=9.8.1
+ENV SOLR_HOME=/opt/solr
+ENV PATH=$PATH:$SOLR_HOME/bin
+
+WORKDIR /tmp
+
+ARG SOLR_DOWNLOAD_URL=https://archive.apache.org/dist/solr/solr/${SOLR_VERSION}/solr-${SOLR_VERSION}.tgz
+
+
+RUN wget "$SOLR_DOWNLOAD_URL" \
+    && tar -zxvf solr-${SOLR_VERSION}.tgz -C /opt \
+    && rm -f solr-${SOLR_VERSION}.tgz \
+    && mv /opt/*solr*  $SOLR_HOME
+
+WORKDIR $SOLR_HOME
+
+# Solr9.X版本尚未集成成功
