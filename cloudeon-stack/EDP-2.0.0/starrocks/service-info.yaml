@@ -84,9 +84,9 @@ configurations:
 
   - name: be_http_port
     recommendExpression: 18040
-    configurableInWizard: true
     valueType: InputNumber
     confFile: "be.conf"
+    configurableInWizard: true
     description: "Be web页面访问端口"
     tag: "端口"
 
@@ -118,6 +118,7 @@ configurations:
     recommendExpression: "90%"
     valueType: InputString
     confFile: "be.conf"
+    configurableInWizard: true
     description: "限制BE进程使用服务器最大内存百分比。用于防止BE内存挤占太多的机器内存，该参数必须大于0，当百分大于100%之后，该值会默认为100%。"
     tag: "性能"
 
@@ -125,37 +126,66 @@ configurations:
     recommendExpression: "/data/starrocks/be/storage"
     valueType: InputString
     confFile: "be.conf"
-    description: "BE数据存储目录，可配置多个，按分号分隔，例如/data1,medium:HDD;/data2,medium:SSD;/data3"
+    configurableInWizard: true
+    description: "BE数据存储目录，可配置多个，按分号分隔，例如/data1,medium:HDD;/data2,medium:SSD;/data3。这是StarRocks存储其所有表数据的路径"
+    tag: "BE数据存储目录"
+
+  - name: spill_local_storage_dir
+    recommendExpression: "/data/starrocks/be/spill_storage"
+    valueType: InputString
+    confFile: "be.conf"
+    configurableInWizard: true
+    description: "BE中间结果落盘存储目录，可配置多个，按分号分隔，例如/data1,medium:HDD;/data2,medium:SSD;/data3。中间计算结果可能占用大量内存，为了防止OOM(内存溢出)，StarRocks 提供了将部分中间结果写入磁盘的功能，称为中间结果落盘（Spill to Disk）"
     tag: "BE数据存储目录"
 
   - name: query_cache_capacity
     recommendExpression: 4194304
     valueType: InputNumber
     confFile: "be.conf"
+    configurableInWizard: true
     description: "BE使用查询缓存。默认为536870912(512 MB)。最小不低于 4 MB。"
     tag: "性能"
 
   - name: fragment_pool_queue_size
     recommendExpression: 2048
     valueType: InputNumber
-    confFile:  "be.conf"
+    confFile: "be.conf"
+    configurableInWizard: true
     description: "单节点上能够处理的查询请求上限"
     tag: "性能"
 
   - name: fragment_pool_thread_num_max
     recommendExpression: 4096
     valueType: InputNumber
-    confFile:  "be.conf"
+    confFile: "be.conf"
+    configurableInWizard: true
     label: "后续查询请求动态创建线程"
     description: "后续查询请求动态创建线程，最大创建512个线程。"
+    tag: "性能"
+
+  - name: datacache_auto_adjust_enable
+    recommendExpression: "true"
+    valueType: InputString
+    confFile: "be.conf"
+    configurableInWizard: true
+    description: "Data Cache 磁盘容量自动调整开关，启用后会根据当前磁盘使用率动态调整缓存容量。默认为false"
+    tag: "性能"
+
+  - name: lake_enable_vertical_compaction_fill_data_cache
+    recommendExpression: "true"
+    valueType: InputString
+    confFile: "be.conf"
+    configurableInWizard: true
+    description: "存算分离集群下，是否允许 Compaction 任务在执行时缓存数据到本地磁盘上。true 表示启用，false 表示不启用"
     tag: "性能"
 
   - name: meta_dir
     recommendExpression: "/data/starrocks/fe/metastore"
     valueType: InputString
     confFile: "fe.conf"
+    configurableInWizard: true
     description: "FE元数据的保存目录。"
-    tag: "FE元数据的保存目录。"
+    tag: "FE元数据存储路径"
 
   - name: http_port
     recommendExpression: 18030
@@ -197,6 +227,7 @@ configurations:
     recommendExpression: "true"
     valueType: InputString
     confFile: "fe.conf"
+    configurableInWizard: true
     label: "FE节点上MySQL服务器的端口"
     description: "是否开启MySQL服务器的异步I/O选项"
     tag: "常用参数"
@@ -211,7 +242,7 @@ configurations:
     tag: "常用参数"
 
   - name: qe_max_connection
-    recommendExpression: 100000
+    recommendExpression: 200000
     valueType: InputNumber
     confFile: "fe.conf"
     configurableInWizard: true
@@ -219,13 +250,47 @@ configurations:
     description: "FE 支持的最大连接数，包括所有用户发起的连接。默认值由 v3.1.12、v3.2.7 起由 1024 变为 4096"
     tag: "常用参数"
 
+  - name: max_automatic_partition_number
+    recommendExpression: 4096
+    valueType: InputNumber
+    confFile: "fe.conf"
+    configurableInWizard: true
+    label: "系统自动创建分区数量上限。"
+    description: "系统自动创建分区数量上限。默认:4096"
+    tag: "常用参数"
+
   - name: run_mode
     recommendExpression: "shared_nothing"
     valueType: InputString
     confFile: "fe.conf"
+    configurableInWizard: true
     label: "StarRocks集群的运行模式"
     description: "StarRocks集群的运行模式。有效值：shared_data(存算分离模式)和 shared_nothing(存算一体模式-默认)。"
     tag: "常用参数。"
+
+  - name: query_cache_entry_max_bytes
+    recommendExpression: "4194304"
+    valueType: InputString
+    confFile: "fe.conf"
+    configurableInWizard: true
+    description: "FE节点启用查询缓存最大字节"
+    tag: "性能优化"
+
+  - name: query_cache_entry_max_rows
+    recommendExpression: "409600"
+    valueType: InputString
+    confFile: "fe.conf"
+    configurableInWizard: true
+    description: "FE节点启用查询缓存最大行数"
+    tag: "性能优化"
+
+  - name: enable_udf
+    recommendExpression: "true"
+    valueType: InputString
+    confFile: "fe.conf"
+    configurableInWizard: true
+    description: "FE节点是否启用udf。默认为false"
+    tag: "性能优化"
 
   - name: enable_query_cache
     recommendExpression: "true"
