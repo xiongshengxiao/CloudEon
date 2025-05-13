@@ -51,6 +51,56 @@ spec:
         security:
           allow_embedding: true
     alertmanager:
+<#if conf['alertManagerConfig.sendEmail']?? && conf['alertManagerConfig.sendEmail'] == "true">
+      templateFiles:
+        email.tmpl: |-
+          {{ define "email.to" }}{{ (index .Alerts 0).Labels.email }}{{ end }}
+        content.tmpl: |-
+          {{ define "email.content.html" }}
+          <html>
+          <body>
+            {{- range .Alerts }}
+            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+              <h3 style="color: #d9534f;">🚨 告警通知</h3>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>告警名称</strong></td>
+                  <td style="padding: 8px; border: 1px solid #ddd;">{{ .Labels.alertname }}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>严重级别</strong></td>
+                  <td style="padding: 8px; border: 1px solid #ddd; color: #d9534f;">{{ .Labels.alertLevel }}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>实例</strong></td>
+                  <td style="padding: 8px; border: 1px solid #ddd; font-family: monospace;">{{ .Labels.instance }}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>摘要</strong></td>
+                  <td style="padding: 8px; border: 1px solid #ddd;">{{ .Annotations.alertInfo | html }}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>建议</strong></td>
+                  <td style="padding: 8px; border: 1px solid #ddd;">{{ .Annotations.alertAdvice | html }}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>触发时间</strong></td>
+                  <td style="padding: 8px; border: 1px solid #ddd;">{{ .StartsAt.Format "2006-01-02 15:04:05" }}</td>
+                </tr>
+              </table>
+            </div>
+            {{- end }}
+          </body>
+          </html>
+          {{ end }}
+</#if>
+      extraVolumes:
+        - name: email-templates
+          configMap:
+            name: alertmanager-email-templates
+      extraVolumeMounts:
+        - name: email-templates
+          mountPath: /etc/alertmanager/config/
       alertmanagerSpec:
         alertmanagerConfigMatcherStrategy:
           type: None
@@ -63,6 +113,54 @@ spec:
           enabled: true
           image:
             registry: ${conf['image.registry.proxy.k8s']}
+            pullPolicy: IfNotPresent
     kube-state-metrics:
       image:
         registry: ${conf['image.registry.proxy.k8s']}
+        pullPolicy: IfNotPresent
+<#if conf['alertManagerConfig.sendEmail']?? && conf['alertManagerConfig.sendEmail'] == "true">
+    additionalConfigMaps:
+      - name: alertmanager-email-templates
+        namespace: ${conf['kube-prometheus.namespace']}
+        data:
+          email.tmpl: |
+            {{ define "email.to" }}{{ (index .Alerts 0).Labels.email }}{{ end }}
+          content.tmpl: |
+            {{ define "email.content.html" }}
+            <html>
+            <body>
+              {{- range .Alerts }}
+              <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+                <h3 style="color: #d9534f;">🚨 告警通知</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>告警名称</strong></td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">{{ .Labels.alertname }}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>严重级别</strong></td>
+                    <td style="padding: 8px; border: 1px solid #ddd; color: #d9534f;">{{ .Labels.alertLevel }}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>实例</strong></td>
+                    <td style="padding: 8px; border: 1px solid #ddd; font-family: monospace;">{{ .Labels.instance }}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>摘要</strong></td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">{{ .Annotations.alertInfo | html }}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>建议</strong></td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">{{ .Annotations.alertAdvice | html }}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;"><strong>触发时间</strong></td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">{{ .StartsAt.Format "2006-01-02 15:04:05" }}</td>
+                  </tr>
+                </table>
+              </div>
+              {{- end }}
+            </body>
+            </html>
+            {{ end }}
+</#if>
