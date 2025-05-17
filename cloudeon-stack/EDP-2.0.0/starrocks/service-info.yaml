@@ -123,7 +123,7 @@ configurations:
     tag: "性能"
 
   - name: storage_root_path
-    recommendExpression: "/data/starrocks/be/storage"
+    recommendExpression: "/data/1/be/storage"
     valueType: InputString
     confFile: "be.conf"
     configurableInWizard: true
@@ -131,7 +131,7 @@ configurations:
     tag: "BE数据存储目录"
 
   - name: spill_local_storage_dir
-    recommendExpression: "/data/starrocks/be/spill_storage"
+    recommendExpression: "/data/1/be/spill_storage"
     valueType: InputString
     confFile: "be.conf"
     configurableInWizard: true
@@ -180,7 +180,7 @@ configurations:
     tag: "性能"
 
   - name: meta_dir
-    recommendExpression: "/data/starrocks/fe/metastore"
+    recommendExpression: "/data/1/fe/metastore"
     valueType: InputString
     confFile: "fe.conf"
     configurableInWizard: true

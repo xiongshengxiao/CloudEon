@@ -3,8 +3,9 @@ set -xeuo pipefail
 
 # 创建目录
 mkdir -p /workspace/logs
-mkdir -p /data/starrocks/fe/metastore
-mkdir -p /data/starrocks/be/storage
+mkdir -p /data/1/fe/metastore
+mkdir -p /data/1/be/storage
+mkdir -p /data/1/be/spill_storage
 
 # 复制配置文件
 mkdir -p /workspace/filebeat/inputs/
