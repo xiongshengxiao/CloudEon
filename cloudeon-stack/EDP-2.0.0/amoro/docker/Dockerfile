@@ -1,4 +1,4 @@
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/flink:1.15.4
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/flink:1.15.4
 
 ENV AMORO_HOME=/opt/amoro
 ENV PATH=$PATH:$AMORO_HOME/bin

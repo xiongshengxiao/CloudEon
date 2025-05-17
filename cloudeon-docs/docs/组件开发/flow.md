@@ -22,7 +22,7 @@
 dockerfile的核心是配置基础环境变量和下载安装软件，其他和业务相关的操作应放到启动脚本里面去，保持dockerfile整洁
 
 ```dockerfile
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:latest
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/jdk:latest
 
 ENV ZOOKEEPER_HOME=/opt/zookeeper \
     ZOOKEEPER_VERSION=3.7.1

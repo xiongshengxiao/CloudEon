@@ -26,7 +26,7 @@ customConfigFiles:
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/kylin:5.0.0-beta"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/kylin:5.0.0-beta"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"

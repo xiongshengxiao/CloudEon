@@ -1,4 +1,4 @@
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:8-ubuntu
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/jdk:8-ubuntu
 
 ENV ELASTICSEARCH_HOME=/opt/elasticsearch \
     ELASTICSEARCH_VERSION=7.16.3

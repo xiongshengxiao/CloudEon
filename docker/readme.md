@@ -24,7 +24,7 @@ version="${filename#cloudeon-assembly-}"
 version="${version%-release*}"
 
 docker build --build-arg CLOUDEON_VERSION=$version \
-             -t registry.cn-guangzhou.aliyuncs.com/bigdata200/cloudeon:$version .
+             -t registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/cloudeon:$version .
 
 rm -f ./$filename
 
@@ -34,7 +34,7 @@ rm -f ./$filename
 
 执行以下命令将镜像推送到 Docker 仓库：
 ```shell
-docker push registry.cn-guangzhou.aliyuncs.com/bigdata200/cloudeon:$version
+docker push registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/cloudeon:$version
 
 ```
 
@@ -44,7 +44,7 @@ docker push registry.cn-guangzhou.aliyuncs.com/bigdata200/cloudeon:$version
 
 /opt/cloudeon/db 将用来存储h2文件
 ```shell
-image=registry.cn-guangzhou.aliyuncs.com/bigdata200/cloudeon:v2.0.0-beta.2
+image=registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/cloudeon:v2.0.0-beta.2
 
 docker run -d --name cloudeon \
  -p 7700:7700 \
@@ -58,7 +58,7 @@ docker run -d --name cloudeon \
 使用默认配置运行 Cloudeon 容器：
 
 ```shell
-image=registry.cn-guangzhou.aliyuncs.com/bigdata200/cloudeon:v2.0.0-beta.2
+image=registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/cloudeon:v2.0.0-beta.2
 
 docker run -d --name cloudeon \
  -p 7700:7700 \
@@ -78,7 +78,7 @@ docker run -d --name cloudeon \
 
 #### 获取配置文件
 ```shell
-image=registry.cn-guangzhou.aliyuncs.com/bigdata200/cloudeon:v2.0.0-beta.2
+image=registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/cloudeon:v2.0.0-beta.2
 conf_path_dir=/opt/cloudeon
 
 # 运行临时容器把配置文件复制到外部，如果已有配置文件则此步骤可以跳过
@@ -95,7 +95,7 @@ $image \
 #### 挂载文件并运行
 
 ```
-image=registry.cn-guangzhou.aliyuncs.com/bigdata200/cloudeon:v2.0.0-beta.2
+image=registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/cloudeon:v2.0.0-beta.2
 conf_path_dir=/opt/cloudeon
 docker rm -f cloudeon
 docker run -d --name cloudeon \

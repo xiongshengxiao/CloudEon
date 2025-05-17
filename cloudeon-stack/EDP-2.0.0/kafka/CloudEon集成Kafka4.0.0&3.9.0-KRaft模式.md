@@ -23,8 +23,7 @@ git clone https://gitclone.com/github.com/dromara/CloudEon.git
 `如果集成Kafka的是4.0.0版本，必须基于JDK11+构建镜像。最好是JDK17`
 
 ```shell
-# FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:8-ubuntu
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:17
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/jdk:17
 
 
 ENV KAFKA_HOME=/opt/kafka \

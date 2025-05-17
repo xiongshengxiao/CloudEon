@@ -7,7 +7,7 @@
 /opt/cloudeon/db 将用来存储h2文件
 
 ```shell
-image=registry.cn-guangzhou.aliyuncs.com/bigdata200/cloudeon:v2.0.0-beta.2
+image=registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/cloudeon:v2.0.0-beta.2
 
 docker run -d --name cloudeon \
  -p 7700:7700 \
@@ -21,7 +21,7 @@ docker run -d --name cloudeon \
 使用默认配置运行 Cloudeon 容器：
 
 ```shell
-image=registry.cn-guangzhou.aliyuncs.com/bigdata200/cloudeon:v2.0.0-beta.2
+image=registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/cloudeon:v2.0.0-beta.2
 
 docker run -d --name cloudeon \
  -p 7700:7700 \
@@ -41,7 +41,7 @@ docker run -d --name cloudeon \
 
 #### 获取配置文件
 ```shell
-image=registry.cn-guangzhou.aliyuncs.com/bigdata200/cloudeon:v2.0.0-beta.2
+image=registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/cloudeon:v2.0.0-beta.2
 conf_path_dir=/opt/cloudeon
 
 # 运行临时容器把配置文件复制到外部，如果已有配置文件则此步骤可以跳过
@@ -59,7 +59,7 @@ $image \
 
 ```
 docker rm -f cloudeon
-image=registry.cn-guangzhou.aliyuncs.com/bigdata200/cloudeon:v2.0.0-beta.2
+image=registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/cloudeon:v2.0.0-beta.2
 conf_path_dir=/opt/cloudeon
 docker run -d --name cloudeon \
  -e DB_ACTIVE=mysql \

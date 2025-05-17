@@ -34,7 +34,7 @@ customConfigFiles:
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/trino:424"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/trino:424"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"

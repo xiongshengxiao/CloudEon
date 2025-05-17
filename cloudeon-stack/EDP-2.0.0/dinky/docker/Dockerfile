@@ -1,6 +1,4 @@
-# FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/flink:1.15.4
-# FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/flink:1.20.1
-FROM rockylinux:9
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/rockylinux:9
 
 LABEL baseos=rockylinux9
 

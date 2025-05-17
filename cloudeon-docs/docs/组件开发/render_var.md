@@ -149,7 +149,7 @@ value为map结构，包含service（结构见上）、serviceRoles（结构见�
         "zookeeper.container.request.memory": "1024",
         "znode.container.checkIntervalMs": "1000",
         "zookeeper.client.port": "12181",
-        "serverImage": "registry.cn-guangzhou.aliyuncs.com/bigdata200/zookeeper:3.7.1",
+        "serverImage": "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/zookeeper:3.7.1",
         "tickTime": "9000",
         "initLimit": "10",
         "zookeeper.container.request.cpu": "0.2",

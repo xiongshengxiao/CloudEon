@@ -1,2 +1,2 @@
-docker build  -f Dockerfile -t registry.cn-guangzhou.aliyuncs.com/bigdata200/kyuubi:1.7.0  .
-docker push  registry.cn-guangzhou.aliyuncs.com/bigdata200/kyuubi:1.7.0
+docker build  -f Dockerfile -t registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/kyuubi:1.7.0  .
+docker push  registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/kyuubi:1.7.0

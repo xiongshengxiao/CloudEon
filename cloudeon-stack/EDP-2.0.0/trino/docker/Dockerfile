@@ -1,6 +1,6 @@
 FROM ghcr.io/airlift/jvmkill:latest AS jvmkill
 
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/jdk:17
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/jdk:17
 
 ENV TRINO_HOME=/opt/trino
 ENV PATH=$PATH:$TRINO_HOME/bin

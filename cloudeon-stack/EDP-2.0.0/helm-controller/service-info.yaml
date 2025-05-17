@@ -25,13 +25,13 @@ customConfigFiles: []
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/helm-controller:v0.16.5"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/helm-controller:v0.16.5"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"
   - name: helmDefaultJobImage
     description: "helm默认任务镜像,是helm执行任务时使用的镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/helm-controller:klipper-helm-v0.9.3-build20241008"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/helm-controller:klipper-helm-v0.9.3-build20241008"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"

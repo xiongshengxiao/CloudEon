@@ -1,4 +1,4 @@
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/spark:3.2.3
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/spark:3.2.3
 
 ENV KYUUBI_HOME=/opt/kyuubi
 ENV PATH=$PATH:$KYUUBI_HOME/bin

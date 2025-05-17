@@ -25,14 +25,14 @@ customConfigFiles:
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/elasticsearch:7.16.3"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/elasticsearch:7.16.3"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"
 
   - name: exporterImage
     description: "exporter镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/elasticsearch_exporter:v1.7.0"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/elasticsearch_exporter:v1.7.0"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"

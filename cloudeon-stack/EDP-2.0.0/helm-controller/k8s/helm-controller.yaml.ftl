@@ -43,7 +43,7 @@ spec:
             subPath: config
           env:
             - name: DEFAULT_JOB_IMAGE
-              value: "${conf['helmDefaultJobImage']!"registry.cn-guangzhou.aliyuncs.com/bigdata200/helm-controller:klipper-helm-v0.9.3-build20241008"}"
+              value: "${conf['helmDefaultJobImage']!"registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/helm-controller:klipper-helm-v0.9.3-build20241008"}"
       volumes:
         - name: kube-config
           configMap:

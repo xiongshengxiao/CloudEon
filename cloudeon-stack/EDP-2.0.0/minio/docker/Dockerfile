@@ -1,4 +1,4 @@
-FROM rockylinux:9
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/rockylinux:9
 
 LABEL baseos=rockylinux9
 

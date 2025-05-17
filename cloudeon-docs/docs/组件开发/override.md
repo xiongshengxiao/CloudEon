@@ -252,7 +252,7 @@ configurations:
     # 描述
     description: "服务镜像"
     # 默认值
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/hadoop:3.3.4"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/hadoop:3.3.4"
     # 参数值的类型，支持 InputNumber（数字）、InputString（字符串）、Switch（bool）、Select（枚举）、Slider（滑块）
     valueType: InputString
     # 是否在安装组件时出现该配置，如果为否则需要安装时看不到该配置，安装后才能在配置项界面看到

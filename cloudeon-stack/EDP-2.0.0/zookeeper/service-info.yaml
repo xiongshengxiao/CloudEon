@@ -28,7 +28,7 @@ customConfigFiles:
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-guangzhou.aliyuncs.com/bigdata200/zookeeper:3.7.1"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/zookeeper:3.7.1"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"

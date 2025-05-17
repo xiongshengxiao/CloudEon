@@ -1,0 +1,271 @@
+name: DOLPHINSCHEDULER
+label: "DolphinScheduler"
+description: "可视化分布式任务调度与计算平台"
+#version: 3.2.2
+version: 3.1.9
+dependencies:
+  - "ZOOKEEPER"
+
+supportKerberos: false
+
+dashboard:
+  uid: ""
+
+roles:
+  - name: DS_MASTER
+    label: "DolphinScheduler MasterServer"
+    roleFullName: "ds-master"
+    sortNum: 1
+    type: DEPLOYMENT
+    minNum: 1
+
+  - name: DS_WORKER
+    label: "DolphinScheduler WorkerServer"
+    roleFullName: "ds-worker"
+    sortNum: 2
+    type: DEPLOYMENT
+    minNum: 1
+
+  - name: DS_API
+    label: "DolphinScheduler ApiServer"
+    roleFullName: "ds-api"
+    linkExpression: "http://${localhostname}:${conf['api.server.port']}/dolphinscheduler/ui/login"
+    sortNum: 3
+    type: DEPLOYMENT
+
+    fixedNum : 1
+
+  - name: DS_ALERT
+    label: "DolphinScheduler AlertServer"
+    roleFullName: "ds-alert"
+    sortNum: 4
+    type: DEPLOYMENT
+    minNum: 1
+
+customConfigFiles: []
+
+configurations:
+  - name: serverImage
+    description: "服务镜像"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/dolphinscheduler:3.1.9"
+    valueType: InputString
+    configurableInWizard: true
+    tag: "镜像"
+  - name: data.path.list
+    description: "持久化挂载路径列表，逗号分隔(但当前组件只有第一个路径生效)。当为空时使用默认路径：全局参数global.persistence.basePath/角色名称"
+    recommendExpression: ""
+    valueType: InputString
+    configurableInWizard: true
+    tag: "资源管理"
+
+
+  - name: api.server.port
+    recommendExpression: 12345
+    valueType: InputNumber
+    description: "ApiServer端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: master.server.port
+    recommendExpression: 5679
+    valueType: InputNumber
+    description: "MasterServer端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: master.server.listen.port
+    recommendExpression: 5678
+    valueType: InputNumber
+    description: "MasterServer 监听端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: worker.server.port
+    recommendExpression: 1235
+    valueType: InputNumber
+    description: "WorkerServer端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: worker.server.listener.port
+    recommendExpression: 1234
+    valueType: InputNumber
+    description: "WorkerServer 监听端口"
+    tag: "端口"
+    configurableInWizard: true
+
+  - name: alert.server.port
+    recommendExpression: 50053
+    valueType: InputNumber
+    description: "AlertServer端口"
+    tag: "端口"
+    configurableInWizard: true
+  - name: alert.rpc.port
+    recommendExpression: 50052
+    valueType: InputNumber
+    description: "AlertServer Rpc端口"
+    tag: "端口"
+    configurableInWizard: true
+
+  - name: jdbc.mysql.address
+    recommendExpression: "jdbc:mysql://xxx:3306/dolphinscheduler"
+    needChangeInWizard: true
+    valueType: InputString
+    description: "MySQL数据库地址"
+    tag: "常用参数"
+    configurableInWizard: true
+  - name: jdbc.mysql.username
+    recommendExpression: "root"
+    valueType: InputString
+    description: "MySQL数据库用户名"
+    tag: "常用参数"
+    needChangeInWizard: false
+    configurableInWizard: true
+  - name: jdbc.mysql.password
+    recommendExpression: "xxx"
+    valueType: InputString
+    description: "MySQL数据库密码"
+    needChangeInWizard: true
+    tag: "常用参数"
+    configurableInWizard: true
+
+  - name: ds.master.jvm.memory.percentage
+    description: "DolphinScheduler Master jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 80
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.master.container.limit.cpu
+    description: "DolphinScheduler Master容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.master.container.limit.memory
+    description: "DolphinScheduler Master容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.master.container.request.cpu
+    description: "DolphinScheduler Master容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.master.container.request.memory
+    description: "DolphinScheduler Master容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: ds.worker.jvm.memory.percentage
+    description: "DolphinScheduler Worker jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 80
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.worker.container.limit.cpu
+    description: "DolphinScheduler Worker容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.worker.container.limit.memory
+    description: "DolphinScheduler Worker容器的内存使用限额，单位MB"
+    recommendExpression: 2048
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.worker.container.request.cpu
+    description: "DolphinScheduler Worker容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.worker.container.request.memory
+    description: "DolphinScheduler Worker容器的内存请求量，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: ds.api.jvm.memory.percentage
+    description: "DolphinScheduler Api jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 80
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.api.container.limit.cpu
+    description: "DolphinScheduler Api容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.api.container.limit.memory
+    description: "DolphinScheduler Api容器的内存使用限额，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.api.container.request.cpu
+    description: "DolphinScheduler Api容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.api.container.request.memory
+    description: "DolphinScheduler Api容器的内存请求量，单位MB"
+    recommendExpression: 256
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+
+  - name: ds.alert.jvm.memory.percentage
+    description: "DolphinScheduler Alert jvm堆内存占容器内存限额的百分比"
+    recommendExpression: 80
+    min: 10
+    max: 80
+    valueType: InputNumber
+    unit: ".0"
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.alert.container.limit.cpu
+    description: "DolphinScheduler Alert容器的CPU使用限额"
+    recommendExpression: 1.0
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.alert.container.limit.memory
+    description: "DolphinScheduler Alert容器的内存使用限额，单位MB"
+    recommendExpression: 1024
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.alert.container.request.cpu
+    description: "DolphinScheduler Alert容器的CPU请求量"
+    recommendExpression: 0.2
+    valueType: InputNumber
+    configurableInWizard: true
+    tag: "资源管理"
+  - name: ds.alert.container.request.memory
+    description: "DolphinScheduler Alert容器的内存请求量，单位MB"
+    recommendExpression: 256
+    valueType: InputNumber
+    unit: Mi
+    configurableInWizard: true
+    tag: "资源管理"
+

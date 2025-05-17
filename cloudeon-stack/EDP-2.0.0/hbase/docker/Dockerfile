@@ -1,4 +1,4 @@
-FROM registry.cn-guangzhou.aliyuncs.com/bigdata200/hadoop:3.3.4
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/hadoop:3.3.4
 
 ENV HBASE_HOME=/opt/hbase
 ENV HBASE_VERSION=2.4.16
