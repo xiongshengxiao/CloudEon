@@ -719,9 +719,7 @@ public class ClusterServiceController {
         if (StringUtils.isBlank(dashboardUid)) {
             return ResultDTO.success("该组件未配置监控面板");
         }
-        // 集群ID
-        Integer clusterId = serviceInstanceEntity.getClusterId();
-        Integer globalServiceInstanceId = serviceInstanceRepository.findByClusterIdAndStackServiceName(clusterId, "GLOBAL");
+        Integer globalServiceInstanceId = serviceInstanceRepository.findByClusterIdAndStackServiceName(serviceInstanceEntity.getClusterId(), "GLOBAL");
         List<ServiceInstanceConfigEntity> globalConfigEntityList = serviceInstanceConfigRepository.findByServiceInstanceId(globalServiceInstanceId);
         Map<String, String> globalConfigMap = globalConfigEntityList.stream().collect(Collectors.toMap(ServiceInstanceConfigEntity::getName, ServiceInstanceConfigEntity::getValue));
 
@@ -734,9 +732,9 @@ public class ClusterServiceController {
                 break;
             case "INTERNAL_HELM_KUBE_PROMETHEUS":
                 String grafanaNodePort = serviceService
-                        .getConfigMaps(clusterId, "KUBE_PROMETHEUS_STACK")
+                        .getConfigMaps(serviceInstanceEntity.getClusterId(), "KUBE_PROMETHEUS_STACK")
                         .get("grafana.service.nodePort");
-                String grafanaHost = RandomUtil.randomEle(clusterNodeRepository.findByClusterId(clusterId)).getIp();
+                String grafanaHost = RandomUtil.randomEle(clusterNodeRepository.findAll()).getIp();
                 baseGrafanaUrl = StrUtil.format("http://{}:{}", grafanaHost, grafanaNodePort);
                 break;
             default:
@@ -819,7 +817,7 @@ public class ClusterServiceController {
             List<Pod> podList = client.pods().inNamespace(namespace).withLabel("app", roleServiceFullName).list().getItems();
             // 指定节点的pod
             Pod pod = podList.stream().filter(pod1 -> pod1.getStatus().getHostIP().equals(hostIp)).findFirst().get();
-            
+
             EventList eventList = client.v1().events()
                     .inNamespace(namespace)
                     .withField("involvedObject.name", pod.getMetadata().getName())
