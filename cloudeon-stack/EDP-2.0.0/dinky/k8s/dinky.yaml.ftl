@@ -172,6 +172,9 @@ spec:
           mountPath: /opt/service-common
         - mountPath: "/workspace"
           name: "workspace"
+        - mountPath: "opt/dinky/extends"
+          name: "extends"
+          mountPropagation: HostToContainer
 <#list dataPathList as dataPath>
         - name: local-data-${dataPath?index+1}
           mountPath: /data/${dataPath?index+1}
@@ -206,6 +209,10 @@ spec:
         hostPath:
           type: DirectoryOrCreate
           path: "${dataPathList[0]}/workspace"
+      - name: "extends"
+        hostPath:
+          type: DirectoryOrCreate
+          path: "${dataPathList[0]}/extends"
 <#list dataPathList as dataPath>
       - name: local-data-${dataPath?index+1}
         hostPath:
