@@ -11,12 +11,20 @@
 ARG FLINK_VERSION=1.20.1
 
 # flink官方镜像tag（如 1.20.0-scala_2.12-java8, 1.20.0-scala_2.12-java11, 1.18.1-scala_2.12-java8, 1.19.1-scala_2.12-java8）
-FROM flink:${FLINK_VERSION}-java11
+FROM flink:${FLINK_VERSION}-scala_2.12
 
 ARG FLINK_VERSION
 
 ENV FLINK_HOME=/opt/flink
 #ENV PYTHON_HOME=/opt/miniconda3
+
+ENV HADOOP_VERSION=3.3.4
+ENV HADOOP_HOME=/opt/hadoop
+ADD hadoop-${HADOOP_VERSION}.tar.gz /opt
+RUN ln -s /opt/hadoop-${HADOOP_VERSION} ${HADOOP_HOME}
+ENV HADOOP_CLASSPATH=${HADOOP_HOME}/etc/hadoop:${HADOOP_HOME}/share/hadoop/common/lib/*:${HADOOP_HOME}/share/hadoop/common/*:${HADOOP_HOME}/share/hadoop/hdfs:${HADOOP_HOME}/share/hadoop/hdfs/lib/*:${HADOOP_HOME}/share/hadoop/hdfs/*:${HADOOP_HOME}/share/hadoop/yarn/lib/*:${HADOOP_HOME}/share/hadoop/yarn/*:${HADOOP_HOME}/share/hadoop/mapreduce/lib/*:${HADOOP_HOME}/share/hadoop/mapreduce/*:${HADOOP_HOME}/contrib/capacity-scheduler/*.jar
+ENV HADOOP_CONF_DIR=${HADOOP_HOME}/conf
+ENV PATH=${PATH}:${HADOOP_CLASSPATH}:${HADOOP_CONF_DIR}:${HADOOP_HOME}/bin
 
 USER root
 #RUN wget "https://s3.jcloud.sjtu.edu.cn/899a892efef34b1b944a19981040f55b-oss01/anaconda/miniconda/Miniconda3-py38_4.9.2-Linux-x86_64.sh" -O "miniconda.sh" && chmod +x miniconda.sh
