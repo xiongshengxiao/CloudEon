@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/openjdk:8
 
 ARG BUILD_DATE
 ARG CLOUDEON_VERSION=v0.0.0
