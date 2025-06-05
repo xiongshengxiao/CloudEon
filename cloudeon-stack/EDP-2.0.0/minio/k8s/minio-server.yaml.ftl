@@ -165,6 +165,8 @@ spec:
           mountPath: /opt/service-common
         - mountPath: "/workspace"
           name: "workspace"
+        - mountPath: "/data/minio-data"
+          name: "minio-data"
 <#list dataPathList as dataPath>
         - name: local-data-${dataPath?index+1}
           mountPath: /data/${dataPath?index+1}
@@ -195,6 +197,10 @@ spec:
         hostPath:
           type: DirectoryOrCreate
           path: "${dataPathList[0]}/workspace"
+      - name: "minio-data"
+        hostPath:
+          type: DirectoryOrCreate
+          path: "${dataPathList[0]}/minio-data"
 <#list dataPathList as dataPath>
       - name: local-data-${dataPath?index+1}
         hostPath:
