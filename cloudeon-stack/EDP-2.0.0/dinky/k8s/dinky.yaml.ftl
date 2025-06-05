@@ -175,6 +175,8 @@ spec:
         - mountPath: "opt/dinky/extends"
           name: "extends"
           mountPropagation: HostToContainer
+        - mountPath: "/dinky"
+          name: "dinky-jar"
 <#list dataPathList as dataPath>
         - name: local-data-${dataPath?index+1}
           mountPath: /data/${dataPath?index+1}
@@ -213,6 +215,10 @@ spec:
         hostPath:
           type: DirectoryOrCreate
           path: "${dataPathList[0]}/extends"
+      - name: "dinky-jar"
+        hostPath:
+          type: DirectoryOrCreate
+          path: "${dataPathList[0]}/dinky"
 <#list dataPathList as dataPath>
       - name: local-data-${dataPath?index+1}
         hostPath:
