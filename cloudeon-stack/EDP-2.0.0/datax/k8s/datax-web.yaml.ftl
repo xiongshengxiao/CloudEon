@@ -172,6 +172,14 @@ spec:
           mountPath: /opt/service-common
         - mountPath: "/workspace"
           name: "workspace"
+        - mountPath: "/opt/datax-web/modules/datax-admin/data"
+          name: "datax-admin-data"
+        - mountPath: "/opt/datax-web/modules/datax-admin/logs"
+          name: "datax-admin-logs"
+        - mountPath: "/opt/datax-web/modules/datax-executor/data"
+          name: "datax-executor-data"
+        - mountPath: "/opt/datax-web/modules/datax-executor/logs"
+          name: "datax-executor-logs"
 <#list dataPathList as dataPath>
         - name: local-data-${dataPath?index+1}
           mountPath: /data/${dataPath?index+1}
@@ -202,6 +210,22 @@ spec:
         hostPath:
           type: DirectoryOrCreate
           path: "${dataPathList[0]}/workspace"
+      - name: "datax-admin-data"
+        hostPath:
+          type: DirectoryOrCreate
+          path: "${dataPathList[0]}/datax-admin/data"
+      - name: "datax-admin-logs"
+        hostPath:
+          type: DirectoryOrCreate
+          path: "${dataPathList[0]}/datax-admin/logs"
+      - name: "datax-executor-data"
+        hostPath:
+          type: DirectoryOrCreate
+          path: "${dataPathList[0]}/datax-executor/data"
+      - name: "datax-executor-logs"
+        hostPath:
+          type: DirectoryOrCreate
+          path: "${dataPathList[0]}/datax-executor/logs"
 <#list dataPathList as dataPath>
       - name: local-data-${dataPath?index+1}
         hostPath:

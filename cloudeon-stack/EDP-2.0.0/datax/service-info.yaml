@@ -8,7 +8,7 @@ dependencies:
 supportKerberos: false
 
 dashboard:
-  uid: "datax001"
+  uid: ""
 
 roles:
   - name: DATAX_WEB

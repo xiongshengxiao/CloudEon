@@ -9,25 +9,25 @@
   </#if><#t>
 </#macro>
 <#if alertRules ?? && alertRules?size gt 0>
-  apiVersion: monitoring.coreos.com/v1
-  kind: PrometheusRule
-  metadata:
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
   name: ${serviceFullName}
-  spec:
+spec:
   groups:
   - name: ${serviceFullName}
-  rules:
-  <#list alertRules as rule>
-    -  alert: ${rule.ruleName}
-    expr: <@executeDynamicCode rule.promql />
-    labels:
-    receiver: "webhook"
-    alertLevel: "${rule.alertLevel}"
-    clusterId: "${rule.clusterId}"
-    serviceRoleName: "${rule.stackRoleName}"
-    serviceName: "${rule.stackServiceName}"
-    annotations:
-    alertAdvice: "${rule.alertAdvice}"
-    alertInfo:  "${rule.alertInfo}"
-  </#list>
+    rules:
+    <#list alertRules as rule>
+    - alert: ${rule.ruleName}
+      expr: <@executeDynamicCode rule.promql />
+      labels:
+        receiver: "webhook"
+        alertLevel: "${rule.alertLevel}"
+        clusterId: "${rule.clusterId}"
+        serviceRoleName: "${rule.stackRoleName}"
+        serviceName: "${rule.stackServiceName}"
+      annotations:
+        alertAdvice: "${rule.alertAdvice}"
+        alertInfo: "${rule.alertInfo}"
+    </#list>
 </#if>
