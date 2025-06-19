@@ -1,0 +1,12 @@
+- type: log
+  enabled: true
+  fields:
+    service: SUPERSET
+    role: SUPERSET_SERVER
+  paths:
+    - /workspace/logs/*dinky*.log
+  multiline.pattern: '^\[superset\]  '
+  multiline.negate: true
+  multiline.match: after
+  close_timeout: 5m
+
