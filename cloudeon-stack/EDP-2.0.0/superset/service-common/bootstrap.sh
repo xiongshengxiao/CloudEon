@@ -36,7 +36,7 @@ then
         $MINICONDA3_HOME/envs/superset/bin/pip install --upgrade pip -i https://pypi.douban.com/simple/
 
         echo "安装Superset"
-        $MINICONDA3_HOME/envs/superset/bin/pip install "apache-superset==4.1.2" -i https://pypi.tuna.tsinghua.edu.cn/simple
+        $MINICONDA3_HOME/envs/superset/bin/pip install "apache-superset==4.1.2" -i https://mirrors.aliyun.com/pypi/simple/
         ln -s $MINICONDA3_HOME/envs/superset /opt/superset
 
         echo "生成SECRET_KEY并修改配置SECRET_KEY"
@@ -54,9 +54,9 @@ then
         $MINICONDA3_HOME/envs/superset/lib/python3.10/site-packages/superset/config.py
 
         echo "安装python msyql驱动"
-        $MINICONDA3_HOME/envs/superset/bin/pip install mysqlclient -i https://pypi.tuna.tsinghua.edu.cn/simple
+        $MINICONDA3_HOME/envs/superset/bin/pip install mysqlclient -i https://mirrors.aliyun.com/pypi/simple/
         echo "修复superset db upgrade初始化Supetset数据库提示：TypeError: Field.init() got an unexpected keyword argument 'minLength'"
-        $MINICONDA3_HOME/envs/superset/bin/pip install marshmallow==3.26.1 -i https://pypi.tuna.tsinghua.edu.cn/simple
+        $MINICONDA3_HOME/envs/superset/bin/pip install marshmallow==3.26.1 -i https://mirrors.aliyun.com/pypi/simple/
 
         echo "正在初始化superset元数据..."
         export FLASK_APP=superset
@@ -66,16 +66,16 @@ then
         $MINICONDA3_HOME/envs/superset/bin/superset fab create-admin --username admin --firstname Superset --lastname Admin --email admin@superset.com --password yixiao666
 
         echo "修复运行`superset init`初始化角色和权限时提示：INFO:superset.utils.screenshots:No PIL installation found"
-        $MINICONDA3_HOME/envs/superset/bin/pip install pillow -i https://pypi.tuna.tsinghua.edu.cn/simple
+        $MINICONDA3_HOME/envs/superset/bin/pip install pillow -i https://mirrors.aliyun.com/pypi/simple/
 
         echo "正在初始化superset..."
         $MINICONDA3_HOME/envs/superset/bin/superset init
 
         echo "安装gunicorn-gunicorn是一个Python Web Server，可以和java中的TomCat类比"
-        $MINICONDA3_HOME/envs/superset/bin/pip install gunicorn -i https://pypi.tuna.tsinghua.edu.cn/simple
+        $MINICONDA3_HOME/envs/superset/bin/pip install gunicorn -i https://mirrors.aliyun.com/pypi/simple/
 
         echo "下载安装相关数据源"
-        $MINICONDA3_HOME/envs/superset/bin/pip install psycopg2-binary  pydoris clickhouse-connect elasticsearch-dbapi starrocks thrift pyhive -i https://pypi.tuna.tsinghua.edu.cn/simple
+        $MINICONDA3_HOME/envs/superset/bin/pip install psycopg2-binary  pydoris clickhouse-connect elasticsearch-dbapi starrocks thrift pyhive -i https://mirrors.aliyun.com/pypi/simple/
     fi
 else
     echo "❌ 无法连接到 MySQL，请检查以下配置或服务状态："
