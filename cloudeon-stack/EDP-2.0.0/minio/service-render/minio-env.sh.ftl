@@ -23,6 +23,9 @@ export MINIO_VOLUMES=${conf['MINIO_VOLUMES']}
 #export MINIO_OPTS="--address 0.0.0.0:9000"
 export MINIO_OPTS="--address ${conf['bindHost']}:${conf['minio.server.port']}"
 
+# 设置控制台地址
+export MINIO_CONSOLE_ADDRESS=:9001
+
 # MinIO 服务日志路径
 #export MINIO_SERVER_LOG_PATH=/opt/minio/logs/minio-server.log
 <#--

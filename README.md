@@ -55,7 +55,7 @@ CloudEon 是基于 Kubernetes 的资源安装部署开源大数据组件，实�
 |  6   |           HDFS           |        3.3.4         |                      分布式大数据存储                      |
 |  7   |           YARN           |        3.3.4         |                  分布式资源调度与管理平台                  |
 |  8   |        ZooKeeper         |        3.7.1         |                       分布式协调系统                       |
-|  9   |          Minio           | 2021-04-22T15-44-28Z |                    S3分布式对象存储系统                    |
+|  9   |          Minio           | 2025-04-22T22-12-26Z |                    S3分布式对象存储系统                    |
 |  10  |           Hive           |        3.1.3         |                        离线数据仓库                        |
 |  11  |          Spark           |        3.2.3         |                       分布式计算系统                       |
 |  12  |          Flink           |        1.20.1        |                        实时计算引擎                        |
@@ -88,7 +88,7 @@ CloudEon 是基于 Kubernetes 的资源安装部署开源大数据组件，实�
 - [x] 集成升级Kafka4.0.0&3.9.0-KRaft模式
 - [x] 集成升级Dinky1.2.3
 - [x] 集成Flink1.20.1升级-支持Flink全方面功能(原作者Flink只是部署History服务),包括Python、Minio、FlinkCDC、Kafka、Paimon等支持
-- [x] 集成Minio:2021-04-22T15-44-28Z
+- [x] 集成Minio:2025-04-22T22-12-26Z
 - [x] 集成升级Seatunnel:2.3.8 && Seatunnel_Web:1.0.2
 - [x] 集成DolphinScheduler-3.1.9降级-3.2+版本目前反馈有存在Bug，不适合用于生产
 - [x] 集成DataVines:1.0.0(暂不支持 Flink 引擎)

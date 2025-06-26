@@ -1,7 +1,7 @@
 name: MINIO
 label: "MinIO"
 description: "支持主流的云原生容器化部署、兼容S3的高性能分布式对象存储系统"
-version: 2021-04-22T15-44-28Z
+version: 2025-04-22T22-12-26Z
 
 dependencies:
   - "GLOBAL"
@@ -21,7 +21,7 @@ roles:
     type: DEPLOYMENT
 
     needOdd: false
-    minNum: 4
+    minNum: 1
 
 customConfigFiles:
   - minio-env.sh
@@ -29,7 +29,7 @@ customConfigFiles:
 configurations:
   - name: serverImage
     description: "服务镜像"
-    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/minio:2021-04-22T15-44-28Z"
+    recommendExpression: "registry.cn-shenzhen.aliyuncs.com/yixiao_cloudeon/minio:2025-04-22T22-12-26Z"
     valueType: InputString
     configurableInWizard: true
     tag: "镜像"

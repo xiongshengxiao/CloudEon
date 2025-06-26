@@ -27,7 +27,7 @@ data:
           }
         ]
       },
-      "description": "MinIO Version: RELEASE.2021-04-22T15-44-28Z",
+      "description": "MinIO Version: RELEASE.2025-04-22T22-12-26Z",
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
